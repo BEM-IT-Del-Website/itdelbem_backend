@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Course represents a course in the system
-type Department struct {
+// Club represents a club in the system
+type Club struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
 	Name      string         `gorm:"not null" json:"name"`
 	ShortName string         `gorm:"not null" json:"shortname"`

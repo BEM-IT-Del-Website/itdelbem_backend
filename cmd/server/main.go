@@ -53,7 +53,7 @@ func main() {
 	router.POST("/api/auth/login", handlers.Login)
 	router.POST("/api/auth/refresh", handlers.RefreshToken)
 
-	// Register campus authentication route (works for all role types)
+	// Login for Student or All Role from External API
 	router.POST("/api/auth/campus/login", handlers.CampusLogin)
 
 	// Create handlers
