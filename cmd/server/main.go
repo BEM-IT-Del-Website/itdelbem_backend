@@ -1,6 +1,7 @@
 package main
 
 import (
+	
 	"log"
 	"os"
 
@@ -58,21 +59,8 @@ func main() {
 
 	// Create handlers
 	campusAuthHandler := handlers.NewCampusAuthHandler()
-	// lecturerHandler := handlers.NewLecturerHandler()
-	studentHandler := handlers.NewStudentHandler()
-	// employeeHandler := handlers.NewEmployeeHandler()
-	// facultyHandler := handlers.NewFacultyHandler()
-	// studyProgramHandler := handlers.NewStudyProgramHandler()
-	// buildingHandler := handlers.NewBuildingHandler()
-	// roomHandler := handlers.NewRoomHandler()
-	// academicYearHandler := handlers.NewAcademicYearHandler()
-	// courseHandler := handlers.NewCourseHandler()
-	// studentGroupHandler := handlers.NewStudentGroupHandler()
-	// lecturerAssignmentHandler := handlers.NewLecturerAssignmentHandler()
-	// teachingAssistantAssignmentHandler := handlers.NewTeachingAssistantAssignmentHandler()
-	// courseScheduleHandler := handlers.NewCourseScheduleHandler()
-	// attendanceHandler := handlers.NewAttendanceHandler()
-
+	studentHandler := handlers.NewStudentHandler(database.DB)
+	
 	// Protected routes
 	authRequired := router.Group("/api")
 	authRequired.Use(campus.CampusAuthMiddleware())
