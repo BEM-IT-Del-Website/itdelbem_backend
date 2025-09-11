@@ -29,8 +29,12 @@ type StudentService struct {
 }
 
 // NewStudentService creates a new student service
-func NewStudentService(db *gorm.DB) *StudentService {
-	return &StudentService{db: db}
+func NewStudentService(db *gorm.DB, campusAuth *CampusAuthService) *StudentService {
+    return &StudentService{
+        repository: repositories.NewStudentRepository(),
+        db:         db,
+        campusAuth: campusAuth,
+    }
 }
 
 func (s *StudentService) GetAllStudents(limit, offset int) ([]models.Student, int64, error) {

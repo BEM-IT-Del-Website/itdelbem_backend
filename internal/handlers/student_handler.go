@@ -20,10 +20,10 @@ type StudentHandler struct {
 }
 
 // NewStudentHandler creates a new student handler
-func NewStudentHandler(db *gorm.DB) *StudentHandler {
-	return &StudentHandler{
-		service: services.NewStudentService(db),
-	}
+func NewStudentHandler(db *gorm.DB, campusAuth *services.CampusAuthService) *StudentHandler {
+    return &StudentHandler{
+        service: services.NewStudentService(db, campusAuth),
+    }
 }
 
 // GetAllStudents returns all students
