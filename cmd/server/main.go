@@ -10,6 +10,7 @@ import (
 	"bem_be/internal/database"
 	"bem_be/internal/handlers"
 	"bem_be/internal/middleware"
+	"bem_be/internal/services"
 	"bem_be/internal/utils"
 
 	"github.com/gin-contrib/cors"
@@ -32,6 +33,8 @@ func main() {
 
 	// Initialize auth service (includes both user and student repositories)
 	auth.Initialize()
+	campusAuthService := services.NewCampusAuthService()
+
 
 	// Create admin user
 	err = auth.CreateAdminUser()
@@ -59,7 +62,9 @@ func main() {
 
 	// Create handlers
 	campusAuthHandler := handlers.NewCampusAuthHandler()
-	studentHandler := handlers.NewStudentHandler(database.DB)
+	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
+	associationHandler := handlers.NewAssociationHandler(database.DB)
+	clubHandler := handlers.NewClubHandler(database.DB)
 	
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -76,17 +81,6 @@ func main() {
 			adminRoutes.GET("/campus/token", campusAuthHandler.GetToken)
 			adminRoutes.POST("/campus/token/refresh", campusAuthHandler.RefreshToken)
 
-			// Admin access to lecturer data
-			// adminRoutes.GET("/lecturers", lecturerHandler.GetAllLecturers)
-			// adminRoutes.GET("/lecturers/search", lecturerHandler.SearchLecturers)
-			// adminRoutes.GET("/lecturers/:id", lecturerHandler.GetLecturerByID)
-			// adminRoutes.POST("/lecturers/sync", lecturerHandler.SyncLecturers)
-
-			// Admin access to employee data (replacing assistant lecturer)
-			// adminRoutes.GET("/employees", employeeHandler.GetAllEmployees)
-			// adminRoutes.GET("/employees/:id", employeeHandler.GetEmployeeByID)
-			// adminRoutes.POST("/employees/sync", employeeHandler.SyncEmployees)
-
 			// Admin access to student data
 			adminRoutes.GET("/students", studentHandler.GetAllStudents)
 			adminRoutes.GET("/students/:id", studentHandler.GetStudentByID)
@@ -100,19 +94,19 @@ func main() {
 			// adminRoutes.PUT("/faculties/:id", facultyHandler.UpdateFaculty)
 			// adminRoutes.DELETE("/faculties/:id", facultyHandler.DeleteFaculty)
 
-			// // Admin access to study program data
-			// adminRoutes.GET("/study-programs", studyProgramHandler.GetAllStudyPrograms)
-			// adminRoutes.GET("/study-programs/:id", studyProgramHandler.GetStudyProgramByID)
-			// adminRoutes.POST("/study-programs", studyProgramHandler.CreateStudyProgram)
-			// adminRoutes.PUT("/study-programs/:id", studyProgramHandler.UpdateStudyProgram)
-			// adminRoutes.DELETE("/study-programs/:id", studyProgramHandler.DeleteStudyProgram)
+			// Admin access to study program data
+			adminRoutes.GET("/clubs", clubHandler.GetAllClubs)
+			adminRoutes.GET("/clubs/:id", clubHandler.GetClubByID)
+			adminRoutes.POST("/clubs", clubHandler.CreateClub)
+			adminRoutes.PUT("/clubs/:id", clubHandler.UpdateClub)
+			adminRoutes.DELETE("/clubs/:id", clubHandler.DeleteClub)
 
-			// // Admin access to building data
-			// adminRoutes.GET("/buildings", buildingHandler.GetAllBuildings)
-			// adminRoutes.GET("/buildings/:id", buildingHandler.GetBuildingByID)
-			// adminRoutes.POST("/buildings", buildingHandler.CreateBuilding)
-			// adminRoutes.PUT("/buildings/:id", buildingHandler.UpdateBuilding)
-			// adminRoutes.DELETE("/buildings/:id", buildingHandler.DeleteBuilding)
+			// Admin access to clubassociation data
+			adminRoutes.GET("/association", associationHandler.GetAllAssociations)
+			adminRoutes.GET("/associations/:id", associationHandler.GetAssociationByID)
+			adminRoutes.POST("/associations", associationHandler.CreateAssociation)
+			adminRoutes.PUT("/associations/:id", associationHandler.UpdateAssociation)
+			adminRoutes.DELETE("/associations/:id", associationHandler.DeleteAssociation)
 
 			// // Admin access to room data
 			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
