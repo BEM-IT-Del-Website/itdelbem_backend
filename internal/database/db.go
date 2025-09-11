@@ -157,9 +157,28 @@ func Initialize() {
 
 	err = DB.AutoMigrate(&models.AssociationWorkProgram{})
 	if err != nil {
-		log.Fatalf("Error auto-migrating AssociationWorkProgram model: %v\n", err)
+		log.Fatalf("Error auto-migrating AssociationManagement model: %v\n", err)
 	}
 	log.Println("AssociationWorkProgram table migrated successfully")
+
+	// UKM
+	err = DB.AutoMigrate(&models.Ukm{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating UKM model: %v\n", err)
+	}
+	log.Println("UKM table migrated successfully")
+
+	err = DB.AutoMigrate(&models.UkmManagement{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating UkmManagement model: %v\n", err)
+	}
+	log.Println("UkmManagement table migrated successfully")
+
+	err = DB.AutoMigrate(&models.UkmWorkProgram{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating UkmWorkProgram model: %v\n", err)
+	}
+	log.Println("UkmWorkProgram table migrated successfully")
 
 	// BEM
 	err = DB.AutoMigrate(&models.BEM{})
