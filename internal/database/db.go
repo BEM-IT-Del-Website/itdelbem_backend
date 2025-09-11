@@ -82,6 +82,110 @@ func Initialize() {
 
 	// Lanjutkan migrasi model lain seperti Course, StudentGroup, dll sesuai urutan versi PostgreSQL
 
+	// Departemen
+	err = DB.AutoMigrate(&models.Department{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Department model: %v\n", err)
+	}
+	log.Println("Department table migrated successfully")
+
+	err = DB.AutoMigrate(&models.DepartmentManagement{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating DepartmentManagement model: %v\n", err)
+	}
+	log.Println("DepartmentManagement table migrated successfully")
+
+	err = DB.AutoMigrate(&models.DepartmentWorkProgram{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating DepartmentWorkProgram model: %v\n", err)
+	}
+	log.Println("DepartmentWorkProgram table migrated successfully")
+
+	// Himpunan
+	err = DB.AutoMigrate(&models.Association{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Association model: %v\n", err)
+	}
+	log.Println("Association table migrated successfully")
+
+	err = DB.AutoMigrate(&models.AssociationManagement{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating AssociationManagement model: %v\n", err)
+	}
+	log.Println("AssociationManagement table migrated successfully")
+
+	err = DB.AutoMigrate(&models.AssociationWorkProgram{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating AssociationManagement model: %v\n", err)
+	}
+	log.Println("AssociationWorkProgram table migrated successfully")
+
+	// UKM
+	err = DB.AutoMigrate(&models.Ukm{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating UKM model: %v\n", err)
+	}
+	log.Println("UKM table migrated successfully")
+
+	err = DB.AutoMigrate(&models.UkmManagement{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating UkmManagement model: %v\n", err)
+	}
+	log.Println("UkmManagement table migrated successfully")
+
+	err = DB.AutoMigrate(&models.UkmWorkProgram{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating UkmWorkProgram model: %v\n", err)
+	}
+	log.Println("UkmWorkProgram table migrated successfully")
+
+	// BEM
+	err = DB.AutoMigrate(&models.BEM{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating BEM model: %v\n", err)
+	}
+	log.Println("BEM table migrated successfully")
+
+	// Aktivitas
+	err = DB.AutoMigrate(&models.Activity{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Activity model: %v\n", err)
+	}
+	log.Println("Activity table migrated successfully")
+
+	err = DB.AutoMigrate(&models.Proposal{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Proposal model: %v\n", err)
+	}
+	log.Println("Proposal table migrated successfully")
+
+	err = DB.AutoMigrate(&models.Report{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Report model: %v\n", err)
+	}
+	log.Println("Report table migrated successfully")
+
+	err = DB.AutoMigrate(&models.Finance{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Finance model: %v\n", err)
+	}
+	log.Println("Finance table migrated successfully")
+
+	// Umum
+	err = DB.AutoMigrate(&models.News{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating News model: %v\n", err)
+	}
+	log.Println("News table migrated successfully")
+
+	log.Println("Database schema migrated successfully")
+
+	err = DB.AutoMigrate(&models.Aspiration{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Aspiration model: %v\n", err)
+	}
+	log.Println("Aspiration table migrated successfully")
+
 	log.Println("Database schema migrated successfully")
 }
 

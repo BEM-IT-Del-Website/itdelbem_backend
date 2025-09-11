@@ -6,8 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Department represents a department entity.
-type Department struct {
+type Ukm struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
 	Name      string         `json:"name" gorm:"type:varchar(100);not null"`
 	ShortName string         `json:"short_name" gorm:"type:varchar(50);unique"`
@@ -19,15 +18,14 @@ type Department struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-func (Department) TableName() string {
-	return "departments"
+func (Ukm) TableName() string {
+	return "ukms"
 }
 
-// DepartmentManagement holds the board for a department in a specific period.
-type DepartmentManagement struct {
+type UkmManagement struct {
 	ID           uint           `json:"id" gorm:"primaryKey"`
-	DepartmentID uint           `json:"department_id" gorm:"not null"`
-	Department   *Department    `json:"department,omitempty" gorm:"foreignKey:DepartmentID"`
+	UkmID        uint           `json:"ukm_id" gorm:"not null"`
+	Ukm          *Ukm           `json:"ukm,omitempty" gorm:"foreignKey:UkmID"`
 	LeaderID     uint           `json:"leader_id" gorm:"not null"`
 	Leader       *User          `json:"leader,omitempty" gorm:"foreignKey:LeaderID"`
 	CoLeaderID   *uint          `json:"co_leader_id"`
@@ -42,15 +40,14 @@ type DepartmentManagement struct {
 	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-func (DepartmentManagement) TableName() string {
-	return "department_managements"
+func (UkmManagement) TableName() string {
+	return "ukm_managements"
 }
 
-// DepartmentWorkProgram represents a work program (proker) for a department.
-type DepartmentWorkProgram struct {
+type UkmWorkProgram struct {
 	ID            uint           `json:"id" gorm:"primaryKey"`
-	DepartmentID  uint           `json:"department_id" gorm:"not null"`
-	Department    *Department    `json:"department,omitempty" gorm:"foreignKey:DepartmentID"`
+	UkmID         uint           `json:"ukm_id" gorm:"not null"`
+	Ukm           *Ukm           `json:"ukm,omitempty" gorm:"foreignKey:UkmID"`
 	Name          string         `json:"name" gorm:"type:varchar(150);not null"`
 	Description   string         `json:"description" gorm:"type:text"`
 	Duration      string         `json:"duration" gorm:"type:varchar(100)"`
@@ -66,21 +63,6 @@ type DepartmentWorkProgram struct {
 	DeletedAt     gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-func (DepartmentWorkProgram) TableName() string {
-	return "department_work_programs"
+func (UkmWorkProgram) TableName() string {
+	return "ukm_work_programs"
 }
-
-// Course represents a course in the system
-// type Department struct {
-// 	ID        uint           `gorm:"primaryKey" json:"id"`
-// 	Name      string         `gorm:"not null" json:"name"`
-// 	ShortName string         `gorm:"not null" json:"shortname"`
-// 	Vision    string         `gorm:"not null" json:"vision"`
-// 	Mission   string         `gorm:"not null" json:"mission"`
-// 	Value     string         `gorm:"not null" json:"value"`
-// 	WorkPlan  string         `gorm:"not null" json:"workplan"`
-// 	CreatedAt time.Time      `json:"created_at"`
-// 	UpdatedAt time.Time      `json:"updated_at"`
-// 	DeletedAt gorm.DeletedAt `gorm:"index;uniqueIndex:idx_courses_code_deleted_at" json:"deleted_at,omitempty"`
-// }
-
