@@ -14,20 +14,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// StudentHandler handles HTTP requests related to students
-type StudentHandler struct {
-	service *services.StudentService
+// CommunityHandler handles HTTP requests related to students
+type CommunityHandler struct {
+	service *services.CommunityService
 }
 
-// NewStudentHandler creates a new student handler
-func NewStudentHandler(db *gorm.DB) *StudentHandler {
-	return &StudentHandler{
-		service: services.NewStudentService(db),
+// NewCommunityHandler creates a new student handler
+func NewCommunityHandler(db *gorm.DB) *CommunityHandler {
+	return &CommunityHandler{
+		service: services.NewCommunityService(db),
 	}
 }
 
-// GetAllStudents returns all students
-func (h *StudentHandler) GetAllStudents(c *gin.Context) {
+// GetAllCommunitys returns all students
+func (h *CommunityHandler) GetAllCommunitys(c *gin.Context) {
     // ambil query params
     page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
     perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
@@ -42,7 +42,7 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
     offset := (page - 1) * perPage
 
     // ambil data + total count
-    students, total, err := h.service.GetAllStudents(perPage, offset)
+    students, total, err := h.service.GetAllCommunitys(perPage, offset)
     if err != nil {
         c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
         return
@@ -74,8 +74,8 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 }
 
 
-// GetStudentByID returns a student by ID
-func (h *StudentHandler) GetStudentByID(c *gin.Context) {
+// GetCommunityByID returns a student by ID
+func (h *CommunityHandler) GetCommunityByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
@@ -83,21 +83,21 @@ func (h *StudentHandler) GetStudentByID(c *gin.Context) {
 		return
 	}
 
-	student, err := h.service.GetStudentByID(uint(id))
+	student, err := h.service.GetCommunityByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Student not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Community not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
-		"message": "Student retrieved successfully",
+		"message": "Community retrieved successfully",
 		"data":    student,
 	})
 }
 
-// GetStudentByUserID returns a student by their user ID from the campus system
-func (h *StudentHandler) GetStudentByUserID(c *gin.Context) {
+// GetCommunityByUserID returns a student by their user ID from the campus system
+func (h *CommunityHandler) GetCommunityByUserID(c *gin.Context) {
 	userIDStr := c.Param("user_id")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
@@ -105,28 +105,28 @@ func (h *StudentHandler) GetStudentByUserID(c *gin.Context) {
 		return
 	}
 
-	student, err := h.service.GetStudentByUserID(userID)
+	student, err := h.service.GetCommunityByUserID(userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Student not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Community not found"})
 		return
 	}
 
 	if student == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Student not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Community not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
-		"message": "Student retrieved successfully",
+		"message": "Community retrieved successfully",
 		"data":    student,
 	})
 }
 
-// SyncStudents syncs students from the campus API
-func (h *StudentHandler) SyncStudents(c *gin.Context) {
+// SyncCommunitys syncs students from the campus API
+func (h *CommunityHandler) SyncCommunitys(c *gin.Context) {
 	// Sync students using the service
-	count, err := h.service.SyncStudents()
+	count, err := h.service.SyncCommunitys()
 	if err != nil {
 		errMsg := err.Error()
 		statusCode := http.StatusInternalServerError
@@ -151,7 +151,7 @@ func (h *StudentHandler) SyncStudents(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
-		"message": "Students synced successfully",
+		"message": "Communitys synced successfully",
 		"data": gin.H{
 			"count": count,
 		},

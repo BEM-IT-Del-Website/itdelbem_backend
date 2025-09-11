@@ -10,8 +10,9 @@ import (
 type User struct {
 	ID             uint           `json:"id" gorm:"primaryKey"`
 	Username       string         `json:"username" gorm:"unique;not null;size:50"`
-	Password       string         `json:"-" gorm:"not null;size:255"` // Password is not returned in JSON
 	Role           string         `json:"role" gorm:"not null;size:20"`
+	Password       string         `json:"-" gorm:"not null;size:255"` // Password is not returned in JSON
+	Position       string         `json:"position" gorm:"not null;size:50"`
 	ExternalUserID *int           `json:"external_user_id" gorm:"uniqueIndex;comment:External user ID from campus system"` // External ID from campus system
 	CreatedAt      time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt      time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
@@ -74,4 +75,4 @@ type OrderedLoginResponse struct {
 // RefreshRequest represents the refresh token request body
 type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
-} 
+}

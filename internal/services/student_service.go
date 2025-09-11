@@ -1,6 +1,7 @@
 package services
 
 import (
+	"gorm.io/gorm"
 	"context"
 	"encoding/json"
 	"errors"
@@ -24,19 +25,29 @@ const (
 type StudentService struct {
 	repository *repositories.StudentRepository
 	campusAuth *CampusAuthService
+	db *gorm.DB
 }
 
 // NewStudentService creates a new student service
-func NewStudentService() *StudentService {
-	return &StudentService{
-		repository: repositories.NewStudentRepository(),
-		campusAuth: NewCampusAuthService(),
-	}
+func NewStudentService(db *gorm.DB) *StudentService {
+	return &StudentService{db: db}
 }
 
-// GetAllStudents returns all students from the database
-func (s *StudentService) GetAllStudents() ([]models.Student, error) {
-	return s.repository.FindAll()
+func (s *StudentService) GetAllStudents(limit, offset int) ([]models.Student, int64, error) {
+	var students []models.Student
+	var total int64
+
+	// hitung total data
+	if err := s.db.Model(&models.Student{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// ambil data dengan pagination
+	if err := s.db.Limit(limit).Offset(offset).Find(&students).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return students, total, nil
 }
 
 // GetStudentByID returns a student by ID
