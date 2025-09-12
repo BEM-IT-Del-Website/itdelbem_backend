@@ -64,6 +64,7 @@ func main() {
 	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
 	associationHandler := handlers.NewAssociationHandler(database.DB)
 	bemHandler := handlers.NewBemHandler(database.DB)
+	announcementHandler := handlers.NewAnnouncementHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
 
 	// Protected routes
@@ -113,6 +114,12 @@ func main() {
 			adminRoutes.POST("/bems", bemHandler.CreateBem)
 			adminRoutes.PUT("/bems/:id", bemHandler.UpdateBem)
 			adminRoutes.DELETE("/bems/:id", bemHandler.DeleteBem)
+
+			adminRoutes.GET("/announcement", announcementHandler.GetAllAnnouncements)
+			adminRoutes.GET("/announcements/:id", announcementHandler.GetAnnouncementByID)
+			adminRoutes.POST("/announcements", announcementHandler.CreateAnnouncement)
+			adminRoutes.PUT("/announcements/:id", announcementHandler.UpdateAnnouncement)
+			adminRoutes.DELETE("/announcements/:id", announcementHandler.DeleteAnnouncement)
 
 			// // Admin access to room data
 			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
