@@ -1,7 +1,7 @@
 package main
 
 import (
-	
+	"fmt"
 	"log"
 	"os"
 
@@ -35,7 +35,6 @@ func main() {
 	auth.Initialize()
 	campusAuthService := services.NewCampusAuthService()
 
-
 	// Create admin user
 	err = auth.CreateAdminUser()
 	if err != nil {
@@ -64,8 +63,9 @@ func main() {
 	campusAuthHandler := handlers.NewCampusAuthHandler()
 	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
 	associationHandler := handlers.NewAssociationHandler(database.DB)
+	bemHandler := handlers.NewBemHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
-	
+
 	// Protected routes
 	authRequired := router.Group("/api")
 	authRequired.Use(campus.CampusAuthMiddleware())
@@ -107,6 +107,12 @@ func main() {
 			adminRoutes.POST("/associations", associationHandler.CreateAssociation)
 			adminRoutes.PUT("/associations/:id", associationHandler.UpdateAssociation)
 			adminRoutes.DELETE("/associations/:id", associationHandler.DeleteAssociation)
+
+			adminRoutes.GET("/bem", bemHandler.GetAllBems)
+			adminRoutes.GET("/bems/:id", bemHandler.GetBemByID)
+			adminRoutes.POST("/bems", bemHandler.CreateBem)
+			adminRoutes.PUT("/bems/:id", bemHandler.UpdateBem)
+			adminRoutes.DELETE("/bems/:id", bemHandler.DeleteBem)
 
 			// // Admin access to room data
 			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
@@ -233,31 +239,31 @@ func main() {
 			// teachingAssistantAttendanceHandler := handlers.NewTeachingAssistantAttendanceHandler()
 
 			// Attendance management routes for assistants - full capabilities like lecturers
-		// 	assistantRoutes.POST("/attendance/sessions", teachingAssistantAttendanceHandler.CreateAttendanceSession)
-		// 	assistantRoutes.GET("/attendance/sessions/active", teachingAssistantAttendanceHandler.GetActiveAttendanceSessions)
-		// 	assistantRoutes.GET("/attendance/sessions", teachingAssistantAttendanceHandler.GetAttendanceSessions)
-		// 	assistantRoutes.GET("/attendance/sessions/:id", teachingAssistantAttendanceHandler.GetAttendanceSessionDetails)
-		// 	assistantRoutes.PUT("/attendance/sessions/:id/close", teachingAssistantAttendanceHandler.CloseAttendanceSession)
-		// 	assistantRoutes.GET("/attendance/sessions/:id/students", teachingAssistantAttendanceHandler.GetStudentAttendances)
-		// 	assistantRoutes.PUT("/attendance/sessions/:id/students/:studentId", teachingAssistantAttendanceHandler.MarkStudentAttendance)
-		// 	assistantRoutes.GET("/attendance/qrcode/:id", teachingAssistantAttendanceHandler.GetQRCode)
-		// 	assistantRoutes.GET("/attendance/sessions/:id/report", teachingAssistantAttendanceHandler.DownloadAttendanceReport)
-		// }
+			// 	assistantRoutes.POST("/attendance/sessions", teachingAssistantAttendanceHandler.CreateAttendanceSession)
+			// 	assistantRoutes.GET("/attendance/sessions/active", teachingAssistantAttendanceHandler.GetActiveAttendanceSessions)
+			// 	assistantRoutes.GET("/attendance/sessions", teachingAssistantAttendanceHandler.GetAttendanceSessions)
+			// 	assistantRoutes.GET("/attendance/sessions/:id", teachingAssistantAttendanceHandler.GetAttendanceSessionDetails)
+			// 	assistantRoutes.PUT("/attendance/sessions/:id/close", teachingAssistantAttendanceHandler.CloseAttendanceSession)
+			// 	assistantRoutes.GET("/attendance/sessions/:id/students", teachingAssistantAttendanceHandler.GetStudentAttendances)
+			// 	assistantRoutes.PUT("/attendance/sessions/:id/students/:studentId", teachingAssistantAttendanceHandler.MarkStudentAttendance)
+			// 	assistantRoutes.GET("/attendance/qrcode/:id", teachingAssistantAttendanceHandler.GetQRCode)
+			// 	assistantRoutes.GET("/attendance/sessions/:id/report", teachingAssistantAttendanceHandler.DownloadAttendanceReport)
+			// }
 
-		// // Student routes
-		// studentRoutes := authRequired.Group("/student")
-		// studentRoutes.Use(middleware.RoleMiddleware("Mahasiswa"))
-		// {
-		// 	// Student routes go here
-		// 	studentRoutes.GET("/schedules", courseScheduleHandler.GetStudentSchedules)
-		// 	studentRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
+			// // Student routes
+			// studentRoutes := authRequired.Group("/student")
+			// studentRoutes.Use(middleware.RoleMiddleware("Mahasiswa"))
+			// {
+			// 	// Student routes go here
+			// 	studentRoutes.GET("/schedules", courseScheduleHandler.GetStudentSchedules)
+			// 	studentRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
 
-		// 	// Add new endpoint for student courses
-		// 	studentCourseHandler := handlers.NewStudentCourseHandler()
-		// 	studentRoutes.GET("/courses", studentCourseHandler.GetStudentCourses)
+			// 	// Add new endpoint for student courses
+			// 	studentCourseHandler := handlers.NewStudentCourseHandler()
+			// 	studentRoutes.GET("/courses", studentCourseHandler.GetStudentCourses)
 
-		// 	// Add new endpoint for students to check active attendance sessions
-		// 	studentAttendanceHandler := handlers.NewStudentAttendanceHandler()
+			// 	// Add new endpoint for students to check active attendance sessions
+			// 	studentAttendanceHandler := handlers.NewStudentAttendanceHandler()
 			// studentRoutes.GET("/attendance/active-sessions", studentAttendanceHandler.GetActiveAttendanceSessions)
 
 			// // Add new endpoint for QR code attendance submission
@@ -269,10 +275,15 @@ func main() {
 	}
 
 	// Start the server
-	port := utils.GetEnvWithDefault("SERVER_PORT", "8080")
+	port := utils.GetEnvWithDefault("SERVER_PORT", "9090")
 
 	// Add public endpoints
 	router.GET("/api/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
+
+	// setelah semua route didefinisikan
+	for _, ri := range router.Routes() {
+		fmt.Println(ri.Method, ri.Path)
+	}
 
 	log.Printf("Server running on port %s", port)
 	err = router.Run(":" + port)
