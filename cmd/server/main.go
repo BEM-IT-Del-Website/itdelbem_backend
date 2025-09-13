@@ -66,6 +66,7 @@ func main() {
 	bemHandler := handlers.NewBemHandler(database.DB)
 	announcementHandler := handlers.NewAnnouncementHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
+	galeryHandler := handlers.NewGaleryHandler(database.DB)
 
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -120,6 +121,12 @@ func main() {
 			adminRoutes.POST("/announcements", announcementHandler.CreateAnnouncement)
 			adminRoutes.PUT("/announcements/:id", announcementHandler.UpdateAnnouncement)
 			adminRoutes.DELETE("/announcements/:id", announcementHandler.DeleteAnnouncement)
+
+			adminRoutes.GET("/galery", galeryHandler.GetAllGalerys)
+			adminRoutes.GET("/galery/:id", galeryHandler.GetGaleryByID)
+			adminRoutes.POST("/galery", galeryHandler.CreateGalery)
+			adminRoutes.PUT("/galery/:id", galeryHandler.UpdateGalery)
+			adminRoutes.DELETE("/galery/:id", galeryHandler.DeleteGalery)
 
 			// // Admin access to room data
 			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
