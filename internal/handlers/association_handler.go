@@ -1,0 +1,172 @@
+package handlers
+
+import (
+	"net/http"
+	"strconv"
+	"math"
+	"fmt"
+	"gorm.io/gorm"
+
+	"bem_be/internal/models"
+	"bem_be/internal/services"
+	"bem_be/internal/utils"
+	"github.com/gin-gonic/gin"
+)
+
+// AssociationHandler handles HTTP requests related to associations
+type AssociationHandler struct {
+	service *services.AssociationService
+}
+
+// NewAssociationHandler creates a new association handler
+func NewAssociationHandler(db *gorm.DB) *AssociationHandler {
+	return &AssociationHandler{
+		service: services.NewAssociationService(db),
+	}
+}
+
+// GetAllAssociations returns all associations
+func (h *AssociationHandler) GetAllAssociations(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+    perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+
+    if page < 1 {
+        page = 1
+    }
+    if perPage < 1 {
+        perPage = 10
+    }
+
+    offset := (page - 1) * perPage
+
+    // ambil data + total count
+    students, total, err := h.service.GetAllAssociations(perPage, offset)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
+        return
+    }
+
+    totalPages := int(math.Ceil(float64(total) / float64(perPage)))
+
+    // siapkan metadata
+    metadata := utils.PaginationMetadata{
+        CurrentPage: page,
+        PerPage:     perPage,
+        TotalItems:  int(total),
+        TotalPages:  totalPages,
+        Links: utils.PaginationLinks{
+            First: fmt.Sprintf("/students?page=1&per_page=%d", perPage),
+            Last:  fmt.Sprintf("/students?page=%d&per_page=%d", totalPages, perPage),
+        },
+    }
+
+    // response dengan metadata
+    response := utils.MetadataFormatResponse(
+        "success",
+        "Berhasil list mendapatkan data",
+        metadata,
+        students,
+    )
+
+    c.JSON(http.StatusOK, response)
+}
+
+// GetAssociationByID returns a association by ID
+func (h *AssociationHandler) GetAssociationByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	stats := c.Query("stats")
+	var result interface{}
+
+	if stats == "true" {
+		result, err = h.service.GetAssociationWithStats(uint(id))
+	} else {
+		result, err = h.service.GetAssociationByID(uint(id))
+	}
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Association not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Association retrieved successfully",
+		"data":    result,
+	})
+}
+
+// CreateAssociation creates a new association
+func (h *AssociationHandler) CreateAssociation(c *gin.Context) {
+	var association models.Association
+
+	if err := c.ShouldBindJSON(&association); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	if err := h.service.CreateAssociation(&association); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  "success",
+		"message": "Association created successfully",
+		"data":    association,
+	})
+}
+
+// UpdateAssociation updates a association
+func (h *AssociationHandler) UpdateAssociation(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	var association models.Association
+	if err := c.ShouldBindJSON(&association); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	association.ID = uint(id)
+
+	if err := h.service.UpdateAssociation(&association); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Association updated successfully",
+		"data":    association,
+	})
+}
+
+// DeleteAssociation deletes a association
+func (h *AssociationHandler) DeleteAssociation(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	if err := h.service.DeleteAssociation(uint(id)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Association deleted successfully",
+	})
+} 

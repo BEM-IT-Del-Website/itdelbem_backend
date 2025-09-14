@@ -73,53 +73,12 @@ func Initialize() {
 	}
 	log.Println("User table migrated successfully")
 
-	err = DB.AutoMigrate(&models.Faculty{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Faculty model: %v\n", err)
-	}
-	log.Println("Faculty table migrated successfully")
-
-	err = DB.AutoMigrate(&models.StudyProgram{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating StudyProgram model: %v\n", err)
-	}
-	log.Println("StudyProgram table migrated successfully")
-
 	err = DB.AutoMigrate(&models.Student{})
 	if err != nil {
 		log.Fatalf("Error auto-migrating Student model: %v\n", err)
 	}
 	log.Println("Student table migrated successfully")
 
-	err = DB.AutoMigrate(&models.Lecturer{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Lecturer model: %v\n", err)
-	}
-	log.Println("Lecturer table migrated successfully")
-
-	err = DB.AutoMigrate(&models.Employee{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Employee model: %v\n", err)
-	}
-	log.Println("Employee table migrated successfully")
-
-	err = DB.AutoMigrate(&models.Admin{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Admin model: %v\n", err)
-	}
-	log.Println("Admin table migrated successfully")
-
-	err = DB.AutoMigrate(&models.Building{}, &models.Room{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Building/Room models: %v", err)
-	}
-	log.Println("Building and Room tables migrated successfully")
-
-	err = DB.AutoMigrate(&models.AcademicYear{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating AcademicYear model: %v\n", err)
-	}
-	log.Println("AcademicYear table migrated successfully")
 
 	// Lanjutkan migrasi model lain seperti Course, StudentGroup, dll sesuai urutan versi PostgreSQL
 
@@ -130,17 +89,17 @@ func Initialize() {
 	}
 	log.Println("Department table migrated successfully")
 
-	err = DB.AutoMigrate(&models.DepartmentManagement{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating DepartmentManagement model: %v\n", err)
-	}
-	log.Println("DepartmentManagement table migrated successfully")
+	// err = DB.AutoMigrate(&models.DepartmentManagement{})
+	// if err != nil {
+	// 	log.Fatalf("Error auto-migrating DepartmentManagement model: %v\n", err)
+	// }
+	// log.Println("DepartmentManagement table migrated successfully")
 
-	err = DB.AutoMigrate(&models.DepartmentWorkProgram{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating DepartmentWorkProgram model: %v\n", err)
-	}
-	log.Println("DepartmentWorkProgram table migrated successfully")
+	// err = DB.AutoMigrate(&models.DepartmentWorkProgram{})
+	// if err != nil {
+	// 	log.Fatalf("Error auto-migrating DepartmentWorkProgram model: %v\n", err)
+	// }
+	// log.Println("DepartmentWorkProgram table migrated successfully")
 
 	// Himpunan
 	err = DB.AutoMigrate(&models.Association{})
@@ -226,6 +185,14 @@ func Initialize() {
 		log.Fatalf("Error auto-migrating Aspiration model: %v\n", err)
 	}
 	log.Println("Aspiration table migrated successfully")
+
+	log.Println("Database schema migrated successfully")
+
+	err = DB.AutoMigrate(&models.Club{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Club model: %v\n", err)
+	}
+	log.Println("Club table migrated successfully")
 
 	log.Println("Database schema migrated successfully")
 }
