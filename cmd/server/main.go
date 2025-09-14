@@ -1,6 +1,7 @@
 package main
 
 import (
+
 	"fmt"
 	"log"
 	"os"
@@ -61,12 +62,16 @@ func main() {
 
 	// Create handlers
 	campusAuthHandler := handlers.NewCampusAuthHandler()
+
+
+	newsHandler := handlers.NewNewsHandler(database.DB)
 	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
 	associationHandler := handlers.NewAssociationHandler(database.DB)
 	bemHandler := handlers.NewBemHandler(database.DB)
 	announcementHandler := handlers.NewAnnouncementHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
 	galeryHandler := handlers.NewGaleryHandler(database.DB)
+
 
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -88,6 +93,13 @@ func main() {
 			adminRoutes.GET("/students/:id", studentHandler.GetStudentByID)
 			adminRoutes.GET("/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
 			adminRoutes.POST("/students/sync", studentHandler.SyncStudents)
+
+			adminRoutes.GET("/news", newsHandler.GetAllNews)
+			adminRoutes.GET("/news/:id", newsHandler.GetNewsByID)
+			adminRoutes.POST("/news", newsHandler.CreateNews)
+			adminRoutes.PUT("/news/:id", newsHandler.UpdateNews)
+			adminRoutes.DELETE("/news/:id", newsHandler.DeleteNews)
+			adminRoutes.POST("/news/deleted/:id", newsHandler.RestoreNews)
 
 			// Admin access to faculty data
 			// adminRoutes.GET("/faculties", facultyHandler.GetAllFaculties)
