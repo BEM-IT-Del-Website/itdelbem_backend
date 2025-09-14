@@ -3,6 +3,11 @@ package services
 import (
 	"gorm.io/gorm"
 	"errors"
+	"fmt"
+	"mime/multipart"
+	"path/filepath"
+	"os"
+	"time"
 
 	"bem_be/internal/models"
 	"bem_be/internal/repositories"
@@ -21,41 +26,56 @@ func NewAssociationService(db *gorm.DB) *AssociationService {
     }
 }
 
+// SaveFile saves uploaded file to local folder
+func saveFile(file *multipart.FileHeader, uploadPath string) (string, error) {
+	// Buat folder kalau belum ada
+	if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
+		err = os.MkdirAll(uploadPath, os.ModePerm)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// Generate nama file unik
+	fileName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), file.Filename)
+	filePath := filepath.Join(uploadPath, fileName)
+
+	// Simpan file
+	if err := saveUploadedFile(file, filePath); err != nil {
+		return "", err
+	}
+
+	return fileName, nil
+}
+
+// Wrapper karena Gin punya `c.SaveUploadedFile`
+func saveUploadedFile(file *multipart.FileHeader, dst string) error {
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = out.ReadFrom(src)
+	return err
+}
+
 // CreateAssociation creates a new association
-func (s *AssociationService) CreateAssociation(association *models.Association) error {
-	// Check if code exists (including soft-deleted)
-	// exists, err := s.repository.CheckNameExists(association.Name, 0)
-	// if err != nil {
-	// 	return err
-	// }
+func (s *AssociationService) CreateAssociation(association *models.Association, file *multipart.FileHeader) error {
+	if file != nil {
+		fileName, err := saveFile(file, "uploads/associations")
+		if err != nil {
+			return errors.New("gagal menyimpan file: " + err.Error())
+		}
+		association.Image = fileName
+	}
 
-	// if exists {
-	// 	// Try to find a soft-deleted association with this code
-	// 	deletedAssociation, err := s.repository.FindDeletedByName(association.Name)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	if deletedAssociation != nil {
-	// 		// Restore the soft-deleted association with updated data
-	// 		deletedAssociation.Name = association.Name
-			
-	// 		// Restore the association
-	// 		restoredAssociation, err := s.repository.RestoreByName(association.Name)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-			
-	// 		// Update with new data
-	// 		restoredAssociation.Name = association.Name
-			
-	// 		return s.repository.Update(restoredAssociation)
-	// 	}
-		
-	// 	return errors.New("kode gedung sudah digunakan")
-	// }
-
-	// Create association
 	return s.repository.Create(association)
 }
 
@@ -82,6 +102,10 @@ func (s *AssociationService) GetAssociationByID(id uint) (*models.Association, e
 // GetAllAssociations gets all associations
 func (s *AssociationService) GetAllAssociations(limit, offset int) ([]models.Association, int64, error) {
     return s.repository.GetAllAssociations(limit, offset)
+}
+
+func (s *AssociationService) GetAllAssociationsGuest() ([]models.Association, error) {
+    return s.repository.GetAllAssociationsGuest()
 }
 
 // DeleteAssociation deletes a association

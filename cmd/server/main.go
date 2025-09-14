@@ -26,6 +26,13 @@ func main() {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
+	cwd, _ := os.Getwd()
+	log.Println("Current working directory:", cwd)
+
+	r := gin.Default()
+    // Serve static files from the "uploads" directory
+    r.Static("/images", "/uploads/associations")
+
 	// Set Gin mode
 	gin.SetMode(utils.GetEnvWithDefault("GIN_MODE", "debug"))
 
@@ -72,6 +79,8 @@ func main() {
 	clubHandler := handlers.NewClubHandler(database.DB)
 	galeryHandler := handlers.NewGaleryHandler(database.DB)
 
+	// Guest Page
+	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
 
 	// Protected routes
 	authRequired := router.Group("/api")

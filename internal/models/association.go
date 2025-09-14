@@ -14,6 +14,7 @@ type Association struct {
 	Vision    string         `json:"vision" gorm:"type:text"`
 	Mission   string         `json:"mission" gorm:"type:text"`
 	Values    string         `json:"values" gorm:"type:text"`
+	Image     string         `json:"image" gorm:"type:text"`
 	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
