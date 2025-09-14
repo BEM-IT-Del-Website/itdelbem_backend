@@ -1,6 +1,8 @@
 package main
 
 import (
+
+	"fmt"
 	"log"
 	"os"
 
@@ -61,24 +63,15 @@ func main() {
 	// Create handlers
 	campusAuthHandler := handlers.NewCampusAuthHandler()
 
-	// lecturerHandler := handlers.NewLecturerHandler()
-	// employeeHandler := handlers.NewEmployeeHandler()
-	// facultyHandler := handlers.NewFacultyHandler()
-	// studyProgramHandler := handlers.NewStudyProgramHandler()
-	// buildingHandler := handlers.NewBuildingHandler()
-	// roomHandler := handlers.NewRoomHandler()
-	// academicYearHandler := handlers.NewAcademicYearHandler()
-	// courseHandler := handlers.NewCourseHandler()
-	// studentGroupHandler := handlers.NewStudentGroupHandler()
-	// lecturerAssignmentHandler := handlers.NewLecturerAssignmentHandler()
-	// teachingAssistantAssignmentHandler := handlers.NewTeachingAssistantAssignmentHandler()
-	// courseScheduleHandler := handlers.NewCourseScheduleHandler()
-	// attendanceHandler := handlers.NewAttendanceHandler()
-	newsHandler := handlers.NewNewsHandler(database.DB)
 
+	newsHandler := handlers.NewNewsHandler(database.DB)
 	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
 	associationHandler := handlers.NewAssociationHandler(database.DB)
+	bemHandler := handlers.NewBemHandler(database.DB)
+	announcementHandler := handlers.NewAnnouncementHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
+	galeryHandler := handlers.NewGaleryHandler(database.DB)
+
 
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -128,6 +121,24 @@ func main() {
 			adminRoutes.POST("/associations", associationHandler.CreateAssociation)
 			adminRoutes.PUT("/associations/:id", associationHandler.UpdateAssociation)
 			adminRoutes.DELETE("/associations/:id", associationHandler.DeleteAssociation)
+
+			adminRoutes.GET("/bem", bemHandler.GetAllBems)
+			adminRoutes.GET("/bems/:id", bemHandler.GetBemByID)
+			adminRoutes.POST("/bems", bemHandler.CreateBem)
+			adminRoutes.PUT("/bems/:id", bemHandler.UpdateBem)
+			adminRoutes.DELETE("/bems/:id", bemHandler.DeleteBem)
+
+			adminRoutes.GET("/announcement", announcementHandler.GetAllAnnouncements)
+			adminRoutes.GET("/announcements/:id", announcementHandler.GetAnnouncementByID)
+			adminRoutes.POST("/announcements", announcementHandler.CreateAnnouncement)
+			adminRoutes.PUT("/announcements/:id", announcementHandler.UpdateAnnouncement)
+			adminRoutes.DELETE("/announcements/:id", announcementHandler.DeleteAnnouncement)
+
+			adminRoutes.GET("/galery", galeryHandler.GetAllGalerys)
+			adminRoutes.GET("/galery/:id", galeryHandler.GetGaleryByID)
+			adminRoutes.POST("/galery", galeryHandler.CreateGalery)
+			adminRoutes.PUT("/galery/:id", galeryHandler.UpdateGalery)
+			adminRoutes.DELETE("/galery/:id", galeryHandler.DeleteGalery)
 
 			// // Admin access to room data
 			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
@@ -290,10 +301,15 @@ func main() {
 	}
 
 	// Start the server
-	port := utils.GetEnvWithDefault("SERVER_PORT", "8080")
+	port := utils.GetEnvWithDefault("SERVER_PORT", "9090")
 
 	// Add public endpoints
 	router.GET("/api/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
+
+	// setelah semua route didefinisikan
+	for _, ri := range router.Routes() {
+		fmt.Println(ri.Method, ri.Path)
+	}
 
 	log.Printf("Server running on port %s", port)
 	err = router.Run(":" + port)
