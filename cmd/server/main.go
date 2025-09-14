@@ -72,6 +72,7 @@ func main() {
 	// teachingAssistantAssignmentHandler := handlers.NewTeachingAssistantAssignmentHandler()
 	// courseScheduleHandler := handlers.NewCourseScheduleHandler()
 	// attendanceHandler := handlers.NewAttendanceHandler()
+	newsHandler := handlers.NewNewsHandler(database.DB)
 
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -104,6 +105,13 @@ func main() {
 			adminRoutes.GET("/students/:id", studentHandler.GetStudentByID)
 			adminRoutes.GET("/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
 			adminRoutes.POST("/students/sync", studentHandler.SyncStudents)
+
+			adminRoutes.GET("/news", newsHandler.GetAllNews)
+			adminRoutes.GET("/news/:id", newsHandler.GetNewsByID)
+			adminRoutes.POST("/news", newsHandler.CreateNews)
+			adminRoutes.PUT("/news/:id", newsHandler.UpdateNews)
+			adminRoutes.DELETE("/news/:id", newsHandler.DeleteNews)
+			adminRoutes.POST("/news/deleted/:id", newsHandler.RestoreNews)
 
 			// Admin access to faculty data
 			// adminRoutes.GET("/faculties", facultyHandler.GetAllFaculties)
@@ -251,31 +259,31 @@ func main() {
 			// teachingAssistantAttendanceHandler := handlers.NewTeachingAssistantAttendanceHandler()
 
 			// Attendance management routes for assistants - full capabilities like lecturers
-		// 	assistantRoutes.POST("/attendance/sessions", teachingAssistantAttendanceHandler.CreateAttendanceSession)
-		// 	assistantRoutes.GET("/attendance/sessions/active", teachingAssistantAttendanceHandler.GetActiveAttendanceSessions)
-		// 	assistantRoutes.GET("/attendance/sessions", teachingAssistantAttendanceHandler.GetAttendanceSessions)
-		// 	assistantRoutes.GET("/attendance/sessions/:id", teachingAssistantAttendanceHandler.GetAttendanceSessionDetails)
-		// 	assistantRoutes.PUT("/attendance/sessions/:id/close", teachingAssistantAttendanceHandler.CloseAttendanceSession)
-		// 	assistantRoutes.GET("/attendance/sessions/:id/students", teachingAssistantAttendanceHandler.GetStudentAttendances)
-		// 	assistantRoutes.PUT("/attendance/sessions/:id/students/:studentId", teachingAssistantAttendanceHandler.MarkStudentAttendance)
-		// 	assistantRoutes.GET("/attendance/qrcode/:id", teachingAssistantAttendanceHandler.GetQRCode)
-		// 	assistantRoutes.GET("/attendance/sessions/:id/report", teachingAssistantAttendanceHandler.DownloadAttendanceReport)
-		// }
+			// 	assistantRoutes.POST("/attendance/sessions", teachingAssistantAttendanceHandler.CreateAttendanceSession)
+			// 	assistantRoutes.GET("/attendance/sessions/active", teachingAssistantAttendanceHandler.GetActiveAttendanceSessions)
+			// 	assistantRoutes.GET("/attendance/sessions", teachingAssistantAttendanceHandler.GetAttendanceSessions)
+			// 	assistantRoutes.GET("/attendance/sessions/:id", teachingAssistantAttendanceHandler.GetAttendanceSessionDetails)
+			// 	assistantRoutes.PUT("/attendance/sessions/:id/close", teachingAssistantAttendanceHandler.CloseAttendanceSession)
+			// 	assistantRoutes.GET("/attendance/sessions/:id/students", teachingAssistantAttendanceHandler.GetStudentAttendances)
+			// 	assistantRoutes.PUT("/attendance/sessions/:id/students/:studentId", teachingAssistantAttendanceHandler.MarkStudentAttendance)
+			// 	assistantRoutes.GET("/attendance/qrcode/:id", teachingAssistantAttendanceHandler.GetQRCode)
+			// 	assistantRoutes.GET("/attendance/sessions/:id/report", teachingAssistantAttendanceHandler.DownloadAttendanceReport)
+			// }
 
-		// // Student routes
-		// studentRoutes := authRequired.Group("/student")
-		// studentRoutes.Use(middleware.RoleMiddleware("Mahasiswa"))
-		// {
-		// 	// Student routes go here
-		// 	studentRoutes.GET("/schedules", courseScheduleHandler.GetStudentSchedules)
-		// 	studentRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
+			// // Student routes
+			// studentRoutes := authRequired.Group("/student")
+			// studentRoutes.Use(middleware.RoleMiddleware("Mahasiswa"))
+			// {
+			// 	// Student routes go here
+			// 	studentRoutes.GET("/schedules", courseScheduleHandler.GetStudentSchedules)
+			// 	studentRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
 
-		// 	// Add new endpoint for student courses
-		// 	studentCourseHandler := handlers.NewStudentCourseHandler()
-		// 	studentRoutes.GET("/courses", studentCourseHandler.GetStudentCourses)
+			// 	// Add new endpoint for student courses
+			// 	studentCourseHandler := handlers.NewStudentCourseHandler()
+			// 	studentRoutes.GET("/courses", studentCourseHandler.GetStudentCourses)
 
-		// 	// Add new endpoint for students to check active attendance sessions
-		// 	studentAttendanceHandler := handlers.NewStudentAttendanceHandler()
+			// 	// Add new endpoint for students to check active attendance sessions
+			// 	studentAttendanceHandler := handlers.NewStudentAttendanceHandler()
 			// studentRoutes.GET("/attendance/active-sessions", studentAttendanceHandler.GetActiveAttendanceSessions)
 
 			// // Add new endpoint for QR code attendance submission
