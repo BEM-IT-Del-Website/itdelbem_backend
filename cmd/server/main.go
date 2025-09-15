@@ -1,6 +1,7 @@
 package main
 
 import (
+
 	"fmt"
 	"log"
 	"os"
@@ -25,6 +26,13 @@ func main() {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
+	cwd, _ := os.Getwd()
+	log.Println("Current working directory:", cwd)
+
+	r := gin.Default()
+    // Serve static files from the "uploads" directory
+    r.Static("/images", "/uploads/associations")
+
 	// Set Gin mode
 	gin.SetMode(utils.GetEnvWithDefault("GIN_MODE", "debug"))
 
@@ -46,7 +54,7 @@ func main() {
 
 	// Configure CORS
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"*"}
+	config.AllowOrigins = []string{"http://localhost:3000"} // []string{"*"}
 	config.AllowCredentials = true
 	config.AllowHeaders = append(config.AllowHeaders, "Authorization", "Content-Type")
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
@@ -61,11 +69,18 @@ func main() {
 
 	// Create handlers
 	campusAuthHandler := handlers.NewCampusAuthHandler()
+
+
+	newsHandler := handlers.NewNewsHandler(database.DB)
 	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
 	associationHandler := handlers.NewAssociationHandler(database.DB)
 	bemHandler := handlers.NewBemHandler(database.DB)
 	announcementHandler := handlers.NewAnnouncementHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
+	galeryHandler := handlers.NewGaleryHandler(database.DB)
+
+	// Guest Page
+	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
 
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -87,6 +102,13 @@ func main() {
 			adminRoutes.GET("/students/:id", studentHandler.GetStudentByID)
 			adminRoutes.GET("/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
 			adminRoutes.POST("/students/sync", studentHandler.SyncStudents)
+
+			adminRoutes.GET("/news", newsHandler.GetAllNews)
+			adminRoutes.GET("/news/:id", newsHandler.GetNewsByID)
+			adminRoutes.POST("/news", newsHandler.CreateNews)
+			adminRoutes.PUT("/news/:id", newsHandler.UpdateNews)
+			adminRoutes.DELETE("/news/:id", newsHandler.DeleteNews)
+			adminRoutes.POST("/news/deleted/:id", newsHandler.RestoreNews)
 
 			// Admin access to faculty data
 			// adminRoutes.GET("/faculties", facultyHandler.GetAllFaculties)
@@ -120,6 +142,12 @@ func main() {
 			adminRoutes.POST("/announcements", announcementHandler.CreateAnnouncement)
 			adminRoutes.PUT("/announcements/:id", announcementHandler.UpdateAnnouncement)
 			adminRoutes.DELETE("/announcements/:id", announcementHandler.DeleteAnnouncement)
+
+			adminRoutes.GET("/galery", galeryHandler.GetAllGalerys)
+			adminRoutes.GET("/galery/:id", galeryHandler.GetGaleryByID)
+			adminRoutes.POST("/galery", galeryHandler.CreateGalery)
+			adminRoutes.PUT("/galery/:id", galeryHandler.UpdateGalery)
+			adminRoutes.DELETE("/galery/:id", galeryHandler.DeleteGalery)
 
 			// // Admin access to room data
 			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
@@ -282,7 +310,7 @@ func main() {
 	}
 
 	// Start the server
-	port := utils.GetEnvWithDefault("SERVER_PORT", "9090")
+	port := utils.GetEnvWithDefault("SERVER_PORT", "8080")
 
 	// Add public endpoints
 	router.GET("/api/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)

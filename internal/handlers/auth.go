@@ -50,17 +50,17 @@ func Login(c *gin.Context) {
 		Token:        response.Token,
 		RefreshToken: response.RefreshToken,
 	}
-
+	
 	// Set content type
 	c.Header("Content-Type", "application/json")
-
+	
 	// Manually marshal to JSON to ensure field order
 	jsonBytes, err := json.Marshal(orderedResponse)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating response"})
 		return
 	}
-
+	
 	// Write the response
 	c.Writer.WriteHeader(http.StatusOK)
 	c.Writer.Write(jsonBytes)

@@ -71,6 +71,28 @@ func (h *AssociationHandler) GetAllAssociations(c *gin.Context) {
     c.JSON(http.StatusOK, response)
 }
 
+func (h *AssociationHandler) GetAllAssociationsGuest(c *gin.Context) {
+    // ambil semua data tanpa limit & offset
+    associations, err := h.service.GetAllAssociationsGuest()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
+        return
+    }
+
+	for i := range associations {
+        associations[i].Image = fmt.Sprintf("http://localhost:8080/images/%s", associations[i].Image)
+    }
+
+    // langsung response tanpa metadata
+    response := utils.ResponseHandler(
+        "success",
+        "Berhasil mendapatkan data",
+        associations,
+    )
+
+    c.JSON(http.StatusOK, response)
+}
+
 // GetAssociationByID returns a association by ID
 func (h *AssociationHandler) GetAssociationByID(c *gin.Context) {
 	idStr := c.Param("id")
@@ -104,18 +126,21 @@ func (h *AssociationHandler) GetAssociationByID(c *gin.Context) {
 // CreateAssociation creates a new association
 func (h *AssociationHandler) CreateAssociation(c *gin.Context) {
 	var association models.Association
-
-	if err := c.ShouldBindJSON(&association); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+	if err := c.ShouldBind(&association); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := h.service.CreateAssociation(&association); err != nil {
+	// ambil file dari form-data
+	file, _ := c.FormFile("logo")
+
+	// panggil service
+	if err := h.service.CreateAssociation(&association, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Association created successfully",
 		"data":    association,

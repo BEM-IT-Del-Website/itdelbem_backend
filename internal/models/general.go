@@ -15,6 +15,7 @@ type News struct {
 	Title         string         `json:"title" gorm:"type:varchar(255);not null"`
 	Content       string         `json:"content" gorm:"type:text;not null"`
 	Category      string         `json:"category" gorm:"type:varchar(100)"`
+	ImageURL      string         `json:"image_url" gorm:"type:varchar(255)"`
 	CreatedAt     time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `json:"-" gorm:"index"`

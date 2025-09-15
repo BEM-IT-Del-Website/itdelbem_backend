@@ -79,7 +79,6 @@ func Initialize() {
 	}
 	log.Println("Student table migrated successfully")
 
-
 	// Lanjutkan migrasi model lain seperti Course, StudentGroup, dll sesuai urutan versi PostgreSQL
 
 	// Departemen
@@ -193,6 +192,14 @@ func Initialize() {
 		log.Fatalf("Error auto-migrating Club model: %v\n", err)
 	}
 	log.Println("Club table migrated successfully")
+
+	log.Println("Database schema migrated successfully")
+
+	err = DB.AutoMigrate(&models.Galery{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Galery model: %v\n", err)
+	}
+	log.Println("Galery table migrated successfully")
 
 	log.Println("Database schema migrated successfully")
 }

@@ -22,10 +22,25 @@ func NewStudentRepository() *StudentRepository {
 }
 
 // FindAll returns all students from the database
-func (r *StudentRepository) FindAll() ([]models.Student, error) {
+func (r *StudentRepository) FindAll(limit, offset int) ([]models.Student, int64, error) {
 	var students []models.Student
-	result := r.db.Find(&students)
-	return students, result.Error
+    var total int64
+
+    query := r.db.Model(&models.Student{})
+
+    // hitung total data
+    query.Count(&total)
+
+    // urutan default (tanpa ikut query dari user)
+    result := query.
+        Order("year_enrolled ASC").
+        Order("study_program ASC").
+        Order("nim ASC").
+        Limit(limit).
+        Offset(offset).
+        Find(&students)
+
+    return students, total, result.Error
 }
 
 // FindByID returns a student by ID

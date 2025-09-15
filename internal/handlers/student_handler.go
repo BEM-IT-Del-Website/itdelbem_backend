@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 	"math"
-	"fmt"
 	"gorm.io/gorm"
 
 	"bem_be/internal/services"
@@ -42,7 +41,7 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
     offset := (page - 1) * perPage
 
     // ambil data + total count
-    students, total, err := h.service.GetAllStudents(perPage, offset)
+	students, total, err := h.service.GetAllStudents(perPage, offset)
     if err != nil {
         c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
         return
@@ -50,19 +49,13 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 
     totalPages := int(math.Ceil(float64(total) / float64(perPage)))
 
-    // siapkan metadata
     metadata := utils.PaginationMetadata{
         CurrentPage: page,
         PerPage:     perPage,
         TotalItems:  int(total),
         TotalPages:  totalPages,
-        Links: utils.PaginationLinks{
-            First: fmt.Sprintf("/students?page=1&per_page=%d", perPage),
-            Last:  fmt.Sprintf("/students?page=%d&per_page=%d", totalPages, perPage),
-        },
     }
 
-    // response dengan metadata
     response := utils.MetadataFormatResponse(
         "success",
         "Berhasil list mendapatkan data",
@@ -72,7 +65,6 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 
     c.JSON(http.StatusOK, response)
 }
-
 
 // GetStudentByID returns a student by ID
 func (h *StudentHandler) GetStudentByID(c *gin.Context) {

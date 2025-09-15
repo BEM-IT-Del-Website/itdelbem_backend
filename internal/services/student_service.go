@@ -38,20 +38,7 @@ func NewStudentService(db *gorm.DB, campusAuth *CampusAuthService) *StudentServi
 }
 
 func (s *StudentService) GetAllStudents(limit, offset int) ([]models.Student, int64, error) {
-	var students []models.Student
-	var total int64
-
-	// hitung total data
-	if err := s.db.Model(&models.Student{}).Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	// ambil data dengan pagination
-	if err := s.db.Limit(limit).Offset(offset).Find(&students).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return students, total, nil
+    return s.repository.FindAll(limit, offset)
 }
 
 // GetStudentByID returns a student by ID
