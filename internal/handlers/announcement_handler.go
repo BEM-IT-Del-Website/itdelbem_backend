@@ -121,7 +121,7 @@ func (h *AnnouncementHandler) CreateAnnouncement(c *gin.Context) {
 			return
 		}
 
-		announcement.FileURL = announcement.FileURL
+		announcement.FilePath = filePath
 	}
 
 	if err := h.service.Createannouncement(&announcement); err != nil {
@@ -166,7 +166,7 @@ func (h *AnnouncementHandler) UpdateAnnouncement(c *gin.Context) {
 			return
 		}
 
-		announcement.FileURL = announcement.FileURL
+		announcement.FilePath = filePath
 	}
 
 	if err := h.service.Updateannouncement(&announcement); err != nil {
