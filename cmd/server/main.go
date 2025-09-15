@@ -26,9 +26,6 @@ func main() {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
-	cwd, _ := os.Getwd()
-	log.Println("Current working directory:", cwd)
-
 	r := gin.Default()
     // Serve static files from the "uploads" directory
     r.Static("/images", "/uploads/associations")
@@ -327,3 +324,5 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+

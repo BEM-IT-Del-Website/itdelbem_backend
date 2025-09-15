@@ -68,13 +68,13 @@ func (h *NewsHandler) GetAllNews(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Berhasil mendapatkan daftar berita",
-		"data":    newsList,
 		"metadata": gin.H{
 			"current_page": page,
 			"per_page":     perPage,
 			"total_items":  total,
 			"total_pages":  totalPages,
 		},
+		"data": newsList,
 	})
 }
 
