@@ -47,6 +47,7 @@ func main() {
 
 	router.Static("/associations", "./uploads/associations")
 	router.Static("/clubs", "./uploads/clubs")
+	router.Static("/departments", "./uploads/departments")
 
 	// Configure CORS
 	config := cors.DefaultConfig()
@@ -77,6 +78,8 @@ func main() {
 
 	// Guest Page
 	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
+	router.GET("/api/club", clubHandler.GetAllClubsGuest)
+	router.GET("/api/department", departmentHandler.GetAllDepartmentsGuest)
 
 	// Protected routes
 	authRequired := router.Group("/api")
