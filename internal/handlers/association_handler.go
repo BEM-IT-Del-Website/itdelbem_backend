@@ -79,10 +79,6 @@ func (h *AssociationHandler) GetAllAssociationsGuest(c *gin.Context) {
         return
     }
 
-	for i := range associations {
-        associations[i].Image = fmt.Sprintf("http://localhost:8080/images/%s", associations[i].Image)
-    }
-
     // langsung response tanpa metadata
     response := utils.ResponseHandler(
         "success",
@@ -124,17 +120,25 @@ func (h *AssociationHandler) GetAssociationByID(c *gin.Context) {
 }
 
 // CreateAssociation creates a new association
+// CreateAssociation creates a new association
 func (h *AssociationHandler) CreateAssociation(c *gin.Context) {
 	var association models.Association
-	if err := c.ShouldBind(&association); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+	// ambil field manual (biar gak coba bind file ke string)
+	association.Name = c.PostForm("name")
+	association.ShortName = c.PostForm("short_name")
+	association.Vision = c.PostForm("vision")
+	association.Mission = c.PostForm("mission")
+	association.Values = c.PostForm("values")
+
+	// ambil file
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Logo file is required"})
 		return
 	}
 
-	// ambil file dari form-data
-	file, _ := c.FormFile("logo")
-
-	// panggil service
+	// kirim ke service
 	if err := h.service.CreateAssociation(&association, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

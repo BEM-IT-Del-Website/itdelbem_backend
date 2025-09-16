@@ -9,12 +9,12 @@ import (
 // Association represents a student association (Himpunan).
 type Association struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
-	Name      string         `json:"name" gorm:"type:varchar(100);not null"`
-	ShortName string         `json:"short_name" gorm:"type:varchar(50);unique"`
-	Vision    string         `json:"vision" gorm:"type:text"`
-	Mission   string         `json:"mission" gorm:"type:text"`
-	Values    string         `json:"values" gorm:"type:text"`
-	Image     string         `json:"image" gorm:"type:text"`
+	Name      string         `form:"name" json:"name" gorm:"type:varchar(100);not null"`
+	ShortName string         `form:"short_name" json:"short_name" gorm:"type:varchar(50);unique"`
+	Vision    string         `form:"vision" json:"vision" gorm:"type:text"`
+	Mission   string         `form:"mission" json:"mission" gorm:"type:text"`
+	Values    string         `form:"values" json:"values" gorm:"type:text"`
+	Image     string         `form:"image" json:"image" gorm:"type:text"`
 	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`

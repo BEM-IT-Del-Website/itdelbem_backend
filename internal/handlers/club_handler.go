@@ -103,22 +103,32 @@ func (h *ClubHandler) GetClubByID(c *gin.Context) {
 
 // CreateClub creates a new club
 func (h *ClubHandler) CreateClub(c *gin.Context) {
-	var club models.Club
+	var association models.Club
 
-	if err := c.ShouldBindJSON(&club); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+	// ambil field manual (biar gak coba bind file ke string)
+	association.Name = c.PostForm("name")
+	association.ShortName = c.PostForm("short_name")
+	association.Vision = c.PostForm("vision")
+	association.Mission = c.PostForm("mission")
+	association.Value = c.PostForm("value")
+
+	// ambil file
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Logo file is required"})
 		return
 	}
 
-	if err := h.service.CreateClub(&club); err != nil {
+	// kirim ke service
+	if err := h.service.CreateClub(&association, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Club created successfully",
-		"data":    club,
+		"data":    association,
 	})
 }
 

@@ -26,10 +26,6 @@ func main() {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
-	r := gin.Default()
-    // Serve static files from the "uploads" directory
-    r.Static("/images", "/uploads/associations")
-
 	// Set Gin mode
 	gin.SetMode(utils.GetEnvWithDefault("GIN_MODE", "debug"))
 
@@ -48,6 +44,9 @@ func main() {
 
 	// Create a new Gin router
 	router := gin.Default()
+
+	router.Static("/associations", "./uploads/associations")
+	router.Static("/clubs", "./uploads/clubs")
 
 	// Configure CORS
 	config := cors.DefaultConfig()
@@ -107,13 +106,6 @@ func main() {
 			adminRoutes.DELETE("/news/:id", newsHandler.DeleteNews)
 			adminRoutes.POST("/news/deleted/:id", newsHandler.RestoreNews)
 
-			// Admin access to faculty data
-			// adminRoutes.GET("/faculties", facultyHandler.GetAllFaculties)
-			// adminRoutes.GET("/faculties/:id", facultyHandler.GetFacultyByID)
-			// adminRoutes.POST("/faculties", facultyHandler.CreateFaculty)
-			// adminRoutes.PUT("/faculties/:id", facultyHandler.UpdateFaculty)
-			// adminRoutes.DELETE("/faculties/:id", facultyHandler.DeleteFaculty)
-
 			// Admin access to study program data
 			adminRoutes.GET("/clubs", clubHandler.GetAllClubs)
 			adminRoutes.GET("/clubs/:id", clubHandler.GetClubByID)
@@ -145,164 +137,18 @@ func main() {
 			adminRoutes.POST("/galery", galeryHandler.CreateGalery)
 			adminRoutes.PUT("/galery/:id", galeryHandler.UpdateGalery)
 			adminRoutes.DELETE("/galery/:id", galeryHandler.DeleteGalery)
-
-			// // Admin access to room data
-			// adminRoutes.GET("/rooms", roomHandler.GetAllRooms)
-			// adminRoutes.GET("/rooms/:id", roomHandler.GetRoomByID)
-			// adminRoutes.POST("/rooms", roomHandler.CreateRoom)
-			// adminRoutes.PUT("/rooms/:id", roomHandler.UpdateRoom)
-			// adminRoutes.DELETE("/rooms/:id", roomHandler.DeleteRoom)
-
-			// // Admin access to academic year data
-			// adminRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
-			// adminRoutes.GET("/academic-years/:id", academicYearHandler.GetAcademicYearByID)
-			// adminRoutes.POST("/academic-years", academicYearHandler.CreateAcademicYear)
-			// adminRoutes.PUT("/academic-years/:id", academicYearHandler.UpdateAcademicYear)
-			// adminRoutes.DELETE("/academic-years/:id", academicYearHandler.DeleteAcademicYear)
-
-			// // Admin access to course data
-			// adminRoutes.GET("/courses", courseHandler.GetAllCourses)
-			// adminRoutes.GET("/courses/:id", courseHandler.GetCourseByID)
-			// adminRoutes.POST("/courses", courseHandler.CreateCourse)
-			// adminRoutes.PUT("/courses/:id", courseHandler.UpdateCourse)
-			// adminRoutes.DELETE("/courses/:id", courseHandler.DeleteCourse)
-
-			// // Admin access to student group data
-			// adminRoutes.GET("/student-groups", studentGroupHandler.GetAllStudentGroups)
-			// adminRoutes.GET("/student-groups/:id", studentGroupHandler.GetStudentGroupByID)
-			// adminRoutes.POST("/student-groups", studentGroupHandler.CreateStudentGroup)
-			// adminRoutes.PUT("/student-groups/:id", studentGroupHandler.UpdateStudentGroup)
-			// adminRoutes.DELETE("/student-groups/:id", studentGroupHandler.DeleteStudentGroup)
-			// adminRoutes.GET("/student-groups/:id/members", studentGroupHandler.GetGroupMembers)
-			// adminRoutes.GET("/student-groups/:id/available-students", studentGroupHandler.GetAvailableStudents)
-			// adminRoutes.POST("/student-groups/:id/members", studentGroupHandler.AddStudentToGroup)
-			// adminRoutes.POST("/student-groups/:id/members/batch", studentGroupHandler.AddMultipleStudentsToGroup)
-			// adminRoutes.DELETE("/student-groups/:id/members/:student_id", studentGroupHandler.RemoveStudentFromGroup)
-			// adminRoutes.POST("/student-groups/:id/members/remove-batch", studentGroupHandler.RemoveMultipleStudentsFromGroup)
-
-			// // Admin access to course schedules
-			// adminRoutes.GET("/schedules", courseScheduleHandler.GetAllSchedules)
-			// adminRoutes.GET("/schedules/:id", courseScheduleHandler.GetScheduleByID)
-			// adminRoutes.POST("/schedules", courseScheduleHandler.CreateSchedule)
-			// adminRoutes.PUT("/schedules/:id", courseScheduleHandler.UpdateSchedule)
-			// adminRoutes.DELETE("/schedules/:id", courseScheduleHandler.DeleteSchedule)
-
-			// // Admin access to lecturer assignments
-			// adminRoutes.GET("/courses/assignments", lecturerAssignmentHandler.GetAllLecturerAssignments)
-			// adminRoutes.GET("/courses/assignments/:id", lecturerAssignmentHandler.GetLecturerAssignmentByID)
-			// adminRoutes.POST("/courses/assignments", lecturerAssignmentHandler.CreateLecturerAssignment)
-			// adminRoutes.PUT("/courses/assignments/:id", lecturerAssignmentHandler.UpdateLecturerAssignment)
-			// adminRoutes.DELETE("/courses/assignments/:id", lecturerAssignmentHandler.DeleteLecturerAssignment)
-			// adminRoutes.GET("/courses/:id/lecturers", lecturerAssignmentHandler.GetAssignmentsByCourse)
-			// adminRoutes.GET("/lecturers/:id/courses", lecturerAssignmentHandler.GetAssignmentsByLecturer)
-			// adminRoutes.GET("/courses/:id/available-lecturers", lecturerAssignmentHandler.GetAvailableLecturers)
-
-			// // Admin access to teaching assistant assignments
-			// adminRoutes.GET("/courses/ta-assignments", teachingAssistantAssignmentHandler.GetAllTeachingAssistantAssignments)
-			// adminRoutes.GET("/courses/ta-assignments/:id", teachingAssistantAssignmentHandler.GetTeachingAssistantAssignmentByID)
-			// adminRoutes.POST("/courses/ta-assignments", teachingAssistantAssignmentHandler.CreateTeachingAssistantAssignment)
-			// adminRoutes.DELETE("/courses/ta-assignments/:id", teachingAssistantAssignmentHandler.DeleteTeachingAssistantAssignment)
-			// adminRoutes.GET("/courses/:id/teaching-assistants", teachingAssistantAssignmentHandler.GetAssignmentsByCourse)
-			// adminRoutes.GET("/employees/:id/assigned-courses", teachingAssistantAssignmentHandler.GetAssignmentsByTeachingAssistant)
-			// adminRoutes.GET("/courses/:id/available-teaching-assistants", teachingAssistantAssignmentHandler.GetAvailableTeachingAssistants)
-
-			// // New endpoint to get lecturer for a course - use a more specific path to avoid conflict
-			// adminRoutes.GET("/course-lecturers/course/:course_id", courseScheduleHandler.GetLecturerForCourse)
-		}
-
-		// Lecturer routes - add lecturer-specific endpoints
-		lecturerRoutes := authRequired.Group("/lecturer")
-		lecturerRoutes.Use(middleware.RoleMiddleware("Dosen", "dosen"))
-		{
-			// // Get lecturer's own assignments
-			// lecturerRoutes.GET("/assignments", lecturerAssignmentHandler.GetMyAssignments)
-
-			// // Get lecturer's course schedules
-			// lecturerRoutes.GET("/schedules", courseScheduleHandler.GetMySchedules)
-
-			// // Get lecturer's courses (alias for assignments, more intuitive API endpoint)
-			// lecturerRoutes.GET("/courses", lecturerAssignmentHandler.GetMyAssignments)
-
-			// // Get academic years (needed for filtering courses and schedules)
-			// lecturerRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
-
-			// // Attendance management routes for lecturers
-			// lecturerRoutes.POST("/attendance/sessions", attendanceHandler.CreateAttendanceSession)
-			// lecturerRoutes.GET("/attendance/sessions/active", attendanceHandler.GetActiveAttendanceSessions)
-			// lecturerRoutes.GET("/attendance/sessions", attendanceHandler.GetAttendanceSessions)
-			// lecturerRoutes.GET("/attendance/sessions/:id", attendanceHandler.GetAttendanceSessionDetails)
-			// lecturerRoutes.PUT("/attendance/sessions/:id/close", attendanceHandler.CloseAttendanceSession)
-			// lecturerRoutes.PUT("/attendance/sessions/:id/cancel", attendanceHandler.CancelAttendanceSession)
-			// lecturerRoutes.GET("/attendance/sessions/:id/students", attendanceHandler.GetStudentAttendances)
-			// lecturerRoutes.PUT("/attendance/sessions/:id/students/:studentId", attendanceHandler.MarkStudentAttendance)
-			// lecturerRoutes.GET("/attendance/statistics/course/:courseScheduleId", attendanceHandler.GetAttendanceStatistics)
-			// lecturerRoutes.GET("/attendance/qrcode/:id", attendanceHandler.GetQRCode)
-			// lecturerRoutes.GET("/attendance/sessions/:id/report", attendanceHandler.DownloadAttendanceReport)
-
-			// // Teaching assistant management endpoints for lecturers
-			// lecturerRoutes.GET("/ta-assignments", teachingAssistantAssignmentHandler.GetMyTeachingAssistantAssignments)
-			// lecturerRoutes.POST("/ta-assignments", teachingAssistantAssignmentHandler.CreateTeachingAssistantAssignment)
-			// lecturerRoutes.DELETE("/ta-assignments/:id", teachingAssistantAssignmentHandler.DeleteTeachingAssistantAssignment)
-			// lecturerRoutes.GET("/courses/:id/available-teaching-assistants", teachingAssistantAssignmentHandler.GetAvailableTeachingAssistants)
 		}
 
 		// Employee routes (replacing assistant routes)
 		employeeRoutes := authRequired.Group("/employee")
 		employeeRoutes.Use(middleware.RoleMiddleware("Pegawai"))
 		{
-			// Employee routes go here
-			// Teaching assistant can view their assigned courses
-			// employeeRoutes.GET("/assigned-courses", teachingAssistantAssignmentHandler.GetAssignmentsByTeachingAssistant)
-
-			// Other employee-specific routes can be added here
 		}
 
 		// Assistant routes
 		assistantRoutes := authRequired.Group("/assistant")
 		assistantRoutes.Use(middleware.RoleMiddleware("Asisten Dosen", "asisten dosen"))
 		{
-			// Assistant can view their assigned schedules
-			// assistantRoutes.GET("/schedules", teachingAssistantAssignmentHandler.GetMyAssignedSchedules)
-
-			// // Get academic years (needed for filtering courses and schedules)
-			// assistantRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
-
-			// // Register teaching assistant attendance handler
-			// teachingAssistantAttendanceHandler := handlers.NewTeachingAssistantAttendanceHandler()
-
-			// Attendance management routes for assistants - full capabilities like lecturers
-			// 	assistantRoutes.POST("/attendance/sessions", teachingAssistantAttendanceHandler.CreateAttendanceSession)
-			// 	assistantRoutes.GET("/attendance/sessions/active", teachingAssistantAttendanceHandler.GetActiveAttendanceSessions)
-			// 	assistantRoutes.GET("/attendance/sessions", teachingAssistantAttendanceHandler.GetAttendanceSessions)
-			// 	assistantRoutes.GET("/attendance/sessions/:id", teachingAssistantAttendanceHandler.GetAttendanceSessionDetails)
-			// 	assistantRoutes.PUT("/attendance/sessions/:id/close", teachingAssistantAttendanceHandler.CloseAttendanceSession)
-			// 	assistantRoutes.GET("/attendance/sessions/:id/students", teachingAssistantAttendanceHandler.GetStudentAttendances)
-			// 	assistantRoutes.PUT("/attendance/sessions/:id/students/:studentId", teachingAssistantAttendanceHandler.MarkStudentAttendance)
-			// 	assistantRoutes.GET("/attendance/qrcode/:id", teachingAssistantAttendanceHandler.GetQRCode)
-			// 	assistantRoutes.GET("/attendance/sessions/:id/report", teachingAssistantAttendanceHandler.DownloadAttendanceReport)
-			// }
-
-			// // Student routes
-			// studentRoutes := authRequired.Group("/student")
-			// studentRoutes.Use(middleware.RoleMiddleware("Mahasiswa"))
-			// {
-			// 	// Student routes go here
-			// 	studentRoutes.GET("/schedules", courseScheduleHandler.GetStudentSchedules)
-			// 	studentRoutes.GET("/academic-years", academicYearHandler.GetAllAcademicYears)
-
-			// 	// Add new endpoint for student courses
-			// 	studentCourseHandler := handlers.NewStudentCourseHandler()
-			// 	studentRoutes.GET("/courses", studentCourseHandler.GetStudentCourses)
-
-			// 	// Add new endpoint for students to check active attendance sessions
-			// 	studentAttendanceHandler := handlers.NewStudentAttendanceHandler()
-			// studentRoutes.GET("/attendance/active-sessions", studentAttendanceHandler.GetActiveAttendanceSessions)
-
-			// // Add new endpoint for QR code attendance submission
-			// studentRoutes.POST("/attendance/qr-submit", studentAttendanceHandler.SubmitQRAttendance)
-
-			// // Add new endpoint for attendance history
-			// studentRoutes.GET("/attendance/history", studentAttendanceHandler.GetAttendanceHistory)
 		}
 	}
 

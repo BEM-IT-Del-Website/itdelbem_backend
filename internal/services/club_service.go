@@ -3,6 +3,10 @@ package services
 import (
 	"gorm.io/gorm"
 	"errors"
+	"fmt"
+	"mime/multipart"
+	"os"
+	"time"
 
 	"bem_be/internal/models"
 	"bem_be/internal/repositories"
@@ -22,41 +26,26 @@ func NewClubService(db *gorm.DB) *ClubService {
 }
 
 // CreateClub creates a new club
-func (s *ClubService) CreateClub(club *models.Club) error {
-	// Check if code exists (including soft-deleted)
-	// exists, err := s.repository.CheckNameExists(club.Name, 0)
-	// if err != nil {
-	// 	return err
-	// }
+func (s *ClubService) CreateClub(association *models.Club, file *multipart.FileHeader) error {
+	// bikin folder kalau belum ada
+	if err := os.MkdirAll("uploads/clubs", os.ModePerm); err != nil {
+		return err
+	}
 
-	// if exists {
-	// 	// Try to find a soft-deleted club with this code
-	// 	deletedClub, err := s.repository.FindDeletedByName(club.Name)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+	// nama file unik
+	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
+	filepath := "uploads/clubs/" + filename
 
-	// 	if deletedClub != nil {
-	// 		// Restore the soft-deleted club with updated data
-	// 		deletedClub.Name = club.Name
-			
-	// 		// Restore the club
-	// 		restoredClub, err := s.repository.RestoreByName(club.Name)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-			
-	// 		// Update with new data
-	// 		restoredClub.Name = club.Name
-			
-	// 		return s.repository.Update(restoredClub)
-	// 	}
-		
-	// 	return errors.New("kode gedung sudah digunakan")
-	// }
+	// simpan file
+	if err := saveUploadedFile(file, filepath); err != nil {
+		return err
+	}
 
-	// Create club
-	return s.repository.Create(club)
+	// simpan path/filename ke struct
+	association.Image = filename
+
+	// simpan ke DB
+	return s.repository.Create(association)
 }
 
 // UpdateClub updates an existing club

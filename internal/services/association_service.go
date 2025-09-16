@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"mime/multipart"
-	"path/filepath"
 	"os"
 	"time"
 
@@ -26,29 +25,30 @@ func NewAssociationService(db *gorm.DB) *AssociationService {
     }
 }
 
-// SaveFile saves uploaded file to local folder
-func saveFile(file *multipart.FileHeader, uploadPath string) (string, error) {
-	// Buat folder kalau belum ada
-	if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
-		err = os.MkdirAll(uploadPath, os.ModePerm)
-		if err != nil {
-			return "", err
-		}
+// CreateAssociation creates a new association
+func (s *AssociationService) CreateAssociation(association *models.Association, file *multipart.FileHeader) error {
+	// bikin folder kalau belum ada
+	if err := os.MkdirAll("uploads/associations", os.ModePerm); err != nil {
+		return err
 	}
 
-	// Generate nama file unik
-	fileName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), file.Filename)
-	filePath := filepath.Join(uploadPath, fileName)
+	// nama file unik
+	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
+	filepath := "uploads/associations/" + filename
 
-	// Simpan file
-	if err := saveUploadedFile(file, filePath); err != nil {
-		return "", err
+	// simpan file
+	if err := saveUploadedFile(file, filepath); err != nil {
+		return err
 	}
 
-	return fileName, nil
+	// simpan path/filename ke struct
+	association.Image = filename
+
+	// simpan ke DB
+	return s.repository.Create(association)
 }
 
-// Wrapper karena Gin punya `c.SaveUploadedFile`
+// helper function simpan file
 func saveUploadedFile(file *multipart.FileHeader, dst string) error {
 	src, err := file.Open()
 	if err != nil {
@@ -64,19 +64,6 @@ func saveUploadedFile(file *multipart.FileHeader, dst string) error {
 
 	_, err = out.ReadFrom(src)
 	return err
-}
-
-// CreateAssociation creates a new association
-func (s *AssociationService) CreateAssociation(association *models.Association, file *multipart.FileHeader) error {
-	if file != nil {
-		fileName, err := saveFile(file, "uploads/associations")
-		if err != nil {
-			return errors.New("gagal menyimpan file: " + err.Error())
-		}
-		association.Image = fileName
-	}
-
-	return s.repository.Create(association)
 }
 
 // UpdateAssociation updates an existing association
