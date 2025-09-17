@@ -24,12 +24,15 @@ func NewStudentHandler(db *gorm.DB, campusAuth *services.CampusAuthService) *Stu
         service: services.NewStudentService(db, campusAuth),
     }
 }
-
-// GetAllStudents returns all students
 func (h *StudentHandler) GetAllStudents(c *gin.Context) {
-    // ambil query params
     page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
     perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+
+    // ambil query params
+    search := c.Query("name") // pakai param "name" untuk search
+    studyProgram := c.Query("study_program")
+    yearEnrolledStr := c.Query("year_enrolled")
+    yearEnrolled, _ := strconv.Atoi(yearEnrolledStr) // default 0 kalau kosong / invalid
 
     if page < 1 {
         page = 1
@@ -40,8 +43,8 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 
     offset := (page - 1) * perPage
 
-    // ambil data + total count
-	students, total, err := h.service.GetAllStudents(perPage, offset)
+    // lempar semua filter ke service
+    students, total, err := h.service.GetAllStudents(perPage, offset, search, studyProgram, yearEnrolled)
     if err != nil {
         c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
         return
@@ -65,6 +68,8 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 
     c.JSON(http.StatusOK, response)
 }
+
+
 
 // GetStudentByID returns a student by ID
 func (h *StudentHandler) GetStudentByID(c *gin.Context) {

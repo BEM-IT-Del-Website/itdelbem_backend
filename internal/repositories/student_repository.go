@@ -21,17 +21,37 @@ func NewStudentRepository() *StudentRepository {
 	}
 }
 
-// FindAll returns all students from the database
-func (r *StudentRepository) FindAll(limit, offset int) ([]models.Student, int64, error) {
-	var students []models.Student
+// FindAll returns all students from the database with optional search and filters
+func (r *StudentRepository) FindAll(limit, offset int, search, studyProgram string, yearEnrolled int) ([]models.Student, int64, error) {
+    var students []models.Student
     var total int64
 
     query := r.db.Model(&models.Student{})
 
-    // hitung total data
+    // filter by search (di full_name, study_program, year_enrolled)
+    if search != "" {
+        likeSearch := "%" + search + "%"
+        query = query.Where(
+            r.db.Where("full_name LIKE ?", likeSearch).
+                Or("study_program LIKE ?", likeSearch).
+                Or("CAST(year_enrolled AS CHAR) LIKE ?", likeSearch),
+        )
+    }
+
+    // filter by study program (kalau ada param)
+    if studyProgram != "" {
+        query = query.Where("study_program = ?", studyProgram)
+    }
+
+    // filter by year enrolled (kalau ada param > 0)
+    if yearEnrolled > 0 {
+        query = query.Where("year_enrolled = ?", yearEnrolled)
+    }
+
+    // hitung total sesuai filter
     query.Count(&total)
 
-    // urutan default (tanpa ikut query dari user)
+    // ambil data
     result := query.
         Order("year_enrolled ASC").
         Order("study_program ASC").
@@ -42,6 +62,8 @@ func (r *StudentRepository) FindAll(limit, offset int) ([]models.Student, int64,
 
     return students, total, result.Error
 }
+
+
 
 // FindByID returns a student by ID
 func (r *StudentRepository) FindByID(id uint) (*models.Student, error) {

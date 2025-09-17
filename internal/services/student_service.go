@@ -37,8 +37,8 @@ func NewStudentService(db *gorm.DB, campusAuth *CampusAuthService) *StudentServi
     }
 }
 
-func (s *StudentService) GetAllStudents(limit, offset int) ([]models.Student, int64, error) {
-    return s.repository.FindAll(limit, offset)
+func (s *StudentService) GetAllStudents(limit, offset int, search, studyProgram string, yearEnrolled int) ([]models.Student, int64, error) {
+    return s.repository.FindAll(limit, offset, search, studyProgram, yearEnrolled)
 }
 
 // GetStudentByID returns a student by ID
