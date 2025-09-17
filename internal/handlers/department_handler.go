@@ -71,6 +71,24 @@ func (h *DepartmentHandler) GetAllDepartments(c *gin.Context) {
     c.JSON(http.StatusOK, response)
 }
 
+func (h *DepartmentHandler) GetAllDepartmentsGuest(c *gin.Context) {
+    // ambil semua data tanpa limit & offset
+    departments, err := h.service.GetAllDepartmentsGuest()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
+        return
+    }
+
+    // langsung response tanpa metadata
+    response := utils.ResponseHandler(
+        "success",
+        "Berhasil mendapatkan data",
+        departments,
+    )
+
+    c.JSON(http.StatusOK, response)
+}
+
 // GetDepartmentByID returns a department by ID
 func (h *DepartmentHandler) GetDepartmentByID(c *gin.Context) {
 	idStr := c.Param("id")
@@ -105,48 +123,29 @@ func (h *DepartmentHandler) GetDepartmentByID(c *gin.Context) {
 func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
 	var department models.Department
 
-	if err := c.ShouldBindJSON(&department); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-		return
-	}
+	// ambil field manual (biar gak coba bind file ke string)
+	department.Name = c.PostForm("name")
+	department.ShortName = c.PostForm("short_name")
+	department.Vision = c.PostForm("vision")
+	department.Mission = c.PostForm("mission")
+	department.Value = c.PostForm("value")
 
-	if err := h.service.CreateDepartment(&department); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"status":  "success",
-		"message": "Department created successfully",
-		"data":    department,
-	})
-}
-
-// UpdateDepartment updates a department
-func (h *DepartmentHandler) UpdateDepartment(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	// ambil file
+	file, err := c.FormFile("image")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Logo file is required"})
 		return
 	}
 
-	var department models.Department
-	if err := c.ShouldBindJSON(&department); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-		return
-	}
-
-	department.ID = uint(id)
-
-	if err := h.service.UpdateDepartment(&department); err != nil {
+	// kirim ke service
+	if err := h.service.CreateDepartment(&department, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
-		"message": "Department updated successfully",
+		"message": "Department created successfully",
 		"data":    department,
 	})
 }

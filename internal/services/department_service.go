@@ -3,6 +3,10 @@ package services
 import (
 	"gorm.io/gorm"
 	"errors"
+	"fmt"
+	"mime/multipart"
+	"os"
+	"time"
 
 	"bem_be/internal/models"
 	"bem_be/internal/repositories"
@@ -22,41 +26,26 @@ func NewDepartmentService(db *gorm.DB) *DepartmentService {
 }
 
 // CreateDepartment creates a new department
-func (s *DepartmentService) CreateDepartment(department *models.Department) error {
-	// Check if code exists (including soft-deleted)
-	// exists, err := s.repository.CheckNameExists(department.Name, 0)
-	// if err != nil {
-	// 	return err
-	// }
+func (s *DepartmentService) CreateDepartment(association *models.Department, file *multipart.FileHeader) error {
+	// bikin folder kalau belum ada
+	if err := os.MkdirAll("uploads/clubs", os.ModePerm); err != nil {
+		return err
+	}
 
-	// if exists {
-	// 	// Try to find a soft-deleted department with this code
-	// 	deletedDepartment, err := s.repository.FindDeletedByName(department.Name)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+	// nama file unik
+	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
+	filepath := "uploads/clubs/" + filename
 
-	// 	if deletedDepartment != nil {
-	// 		// Restore the soft-deleted department with updated data
-	// 		deletedDepartment.Name = department.Name
-			
-	// 		// Restore the department
-	// 		restoredDepartment, err := s.repository.RestoreByName(department.Name)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-			
-	// 		// Update with new data
-	// 		restoredDepartment.Name = department.Name
-			
-	// 		return s.repository.Update(restoredDepartment)
-	// 	}
-		
-	// 	return errors.New("kode gedung sudah digunakan")
-	// }
+	// simpan file
+	if err := saveUploadedFile(file, filepath); err != nil {
+		return err
+	}
 
-	// Create department
-	return s.repository.Create(department)
+	// simpan path/filename ke struct
+	association.Image = filename
+
+	// simpan ke DB
+	return s.repository.Create(association)
 }
 
 // UpdateDepartment updates an existing department
@@ -82,6 +71,10 @@ func (s *DepartmentService) GetDepartmentByID(id uint) (*models.Department, erro
 // GetAllDepartments gets all departments
 func (s *DepartmentService) GetAllDepartments(limit, offset int) ([]models.Department, int64, error) {
     return s.repository.GetAllDepartments(limit, offset)
+}
+
+func (s *DepartmentService) GetAllDepartmentsGuest() ([]models.Department, error) {
+    return s.repository.GetAllDepartmentsGuest()
 }
 
 // DeleteDepartment deletes a department
