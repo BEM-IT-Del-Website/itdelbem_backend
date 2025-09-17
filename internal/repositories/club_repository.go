@@ -52,20 +52,26 @@ func (r *ClubRepository) FindByName(code string) (*models.Club, error) {
 }
 
 // FindAll finds all clubs
-func (r *ClubRepository) GetAllClubs(limit, offset int) ([]models.Club, int64, error) {
+func (r *ClubRepository) GetAllClubs(limit, offset int, search string) ([]models.Club, int64, error) {
     var clubs []models.Club
     var total int64
 
     query := r.db.Model(&models.Club{})
-    if err := query.Count(&total).Error; err != nil {
-        return nil, 0, err
+
+    if search != "" {
+        likeSearch := "%" + search + "%"
+        query = query.Where("name LIKE ?", likeSearch)
     }
 
-    if err := query.Limit(limit).Offset(offset).Find(&clubs).Error; err != nil {
-        return nil, 0, err
-    }
+    query.Count(&total)
 
-    return clubs, total, nil
+    result := query.
+        Order("name ASC").
+        Limit(limit).
+        Offset(offset).
+        Find(&clubs)
+
+    return clubs, total, result.Error
 }
 
 

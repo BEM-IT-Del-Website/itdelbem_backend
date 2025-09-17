@@ -69,9 +69,10 @@ func (s *ClubService) GetClubByID(id uint) (*models.Club, error) {
 }
 
 // GetAllClubs gets all clubs
-func (s *ClubService) GetAllClubs(limit, offset int) ([]models.Club, int64, error) {
-    return s.repository.GetAllClubs(limit, offset)
+func (s *ClubService) GetAllClubs(limit, offset int, search string) ([]models.Club, int64, error) {
+    return s.repository.GetAllClubs(limit, offset,search)
 }
+
 
 func (s *ClubService) GetAllClubsGuest() ([]models.Club, error) {
     return s.repository.GetAllClubsGuest()

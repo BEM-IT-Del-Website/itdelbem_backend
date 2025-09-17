@@ -52,20 +52,27 @@ func (r *AssociationRepository) FindByName(code string) (*models.Association, er
 }
 
 // FindAll finds all associations
-func (r *AssociationRepository) GetAllAssociations(limit, offset int) ([]models.Association, int64, error) {
+// GetAllAssociations returns all associations from the database with optional search filter
+func (r *AssociationRepository) GetAllAssociations(limit, offset int, search string) ([]models.Association, int64, error) {
     var associations []models.Association
     var total int64
 
     query := r.db.Model(&models.Association{})
-    if err := query.Count(&total).Error; err != nil {
-        return nil, 0, err
+
+    if search != "" {
+        likeSearch := "%" + search + "%"
+        query = query.Where("name LIKE ?", likeSearch)
     }
 
-    if err := query.Limit(limit).Offset(offset).Find(&associations).Error; err != nil {
-        return nil, 0, err
-    }
+    query.Count(&total)
 
-    return associations, total, nil
+    result := query.
+        Order("name ASC").
+        Limit(limit).
+        Offset(offset).
+        Find(&associations)
+
+    return associations, total, result.Error
 }
 
 

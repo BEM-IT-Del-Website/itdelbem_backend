@@ -87,9 +87,10 @@ func (s *AssociationService) GetAssociationByID(id uint) (*models.Association, e
 }
 
 // GetAllAssociations gets all associations
-func (s *AssociationService) GetAllAssociations(limit, offset int) ([]models.Association, int64, error) {
-    return s.repository.GetAllAssociations(limit, offset)
+func (s *AssociationService) GetAllAssociations(limit, offset int, search string) ([]models.Association, int64, error) {
+    return s.repository.GetAllAssociations(limit, offset, search)
 }
+
 
 func (s *AssociationService) GetAllAssociationsGuest() ([]models.Association, error) {
     return s.repository.GetAllAssociationsGuest()

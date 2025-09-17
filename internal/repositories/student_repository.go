@@ -38,12 +38,12 @@ func (r *StudentRepository) FindAll(limit, offset int, search, studyProgram stri
         )
     }
 
-    // filter by study program (kalau ada param)
+    // filter by study program (pakai LIKE biar fleksibel)
     if studyProgram != "" {
-        query = query.Where("study_program = ?", studyProgram)
+        query = query.Where("study_program LIKE ?", "%"+studyProgram+"%")
     }
 
-    // filter by year enrolled (kalau ada param > 0)
+    // filter by year enrolled
     if yearEnrolled > 0 {
         query = query.Where("year_enrolled = ?", yearEnrolled)
     }
@@ -62,9 +62,6 @@ func (r *StudentRepository) FindAll(limit, offset int, search, studyProgram stri
 
     return students, total, result.Error
 }
-
-
-
 // FindByID returns a student by ID
 func (r *StudentRepository) FindByID(id uint) (*models.Student, error) {
 	var student models.Student
