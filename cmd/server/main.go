@@ -75,6 +75,7 @@ func main() {
 	announcementHandler := handlers.NewAnnouncementHandler(database.DB)
 	clubHandler := handlers.NewClubHandler(database.DB)
 	galeryHandler := handlers.NewGaleryHandler(database.DB)
+	departmentHandler := handlers.NewDepartmentHandler(database.DB)
 
 	// Guest Page
 	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
@@ -140,6 +141,12 @@ func main() {
 			adminRoutes.POST("/galery", galeryHandler.CreateGalery)
 			adminRoutes.PUT("/galery/:id", galeryHandler.UpdateGalery)
 			adminRoutes.DELETE("/galery/:id", galeryHandler.DeleteGalery)
+
+			adminRoutes.GET("/department", departmentHandler.GetAllDepartments)
+			adminRoutes.GET("/department/:id", departmentHandler.GetDepartmentByID)
+			adminRoutes.POST("/department", departmentHandler.CreateDepartment)
+			adminRoutes.PUT("/department/:id", departmentHandler.UpdateDepartment)
+			adminRoutes.DELETE("/department/:id", departmentHandler.DeleteDepartment)
 		}
 
 		// Employee routes (replacing assistant routes)
@@ -156,7 +163,7 @@ func main() {
 	}
 
 	// Start the server
-	port := utils.GetEnvWithDefault("SERVER_PORT", "8080")
+	port := utils.GetEnvWithDefault("SERVER_PORT", "9090")
 
 	// Add public endpoints
 	router.GET("/api/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
@@ -173,5 +180,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-
