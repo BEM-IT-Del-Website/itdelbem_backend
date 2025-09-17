@@ -69,8 +69,8 @@ func (s *DepartmentService) GetDepartmentByID(id uint) (*models.Department, erro
 }
 
 // GetAllDepartments gets all departments
-func (s *DepartmentService) GetAllDepartments(limit, offset int) ([]models.Department, int64, error) {
-    return s.repository.GetAllDepartments(limit, offset)
+func (s *DepartmentService) GetAllDepartments(limit, offset int, search string) ([]models.Department, int64, error) {
+    return s.repository.GetAllDepartments(limit, offset, search)
 }
 
 func (s *DepartmentService) GetAllDepartmentsGuest() ([]models.Department, error) {

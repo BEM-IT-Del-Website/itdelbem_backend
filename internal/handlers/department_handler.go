@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -27,50 +26,43 @@ func NewDepartmentHandler(db *gorm.DB) *DepartmentHandler {
 	}
 }
 
-// GetAllDepartments returns all departments
 func (h *DepartmentHandler) GetAllDepartments(c *gin.Context) {
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+    page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+    perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+    search := c.Query("name") // pencarian pakai param ?name=
 
-	if page < 1 {
-		page = 1
-	}
-	if perPage < 1 {
-		perPage = 10
-	}
+    if page < 1 {
+        page = 1
+    }
+    if perPage < 1 {
+        perPage = 10
+    }
 
-	offset := (page - 1) * perPage
+    offset := (page - 1) * perPage
 
-	// ambil data + total count
-	students, total, err := h.service.GetAllDepartments(perPage, offset)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
-		return
-	}
+    departments, total, err := h.service.GetAllDepartments(perPage, offset, search)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
+        return
+    }
 
-	totalPages := int(math.Ceil(float64(total) / float64(perPage)))
+    totalPages := int(math.Ceil(float64(total) / float64(perPage)))
 
-	// siapkan metadata
-	metadata := utils.PaginationMetadata{
-		CurrentPage: page,
-		PerPage:     perPage,
-		TotalItems:  int(total),
-		TotalPages:  totalPages,
-		Links: utils.PaginationLinks{
-			First: fmt.Sprintf("/students?page=1&per_page=%d", perPage),
-			Last:  fmt.Sprintf("/students?page=%d&per_page=%d", totalPages, perPage),
-		},
-	}
+    metadata := utils.PaginationMetadata{
+        CurrentPage: page,
+        PerPage:     perPage,
+        TotalItems:  int(total),
+        TotalPages:  totalPages,
+    }
 
-	// response dengan metadata
-	response := utils.MetadataFormatResponse(
-		"success",
-		"Berhasil list mendapatkan data",
-		metadata,
-		students,
-	)
+    response := utils.MetadataFormatResponse(
+        "success",
+        "Berhasil list mendapatkan data associations",
+        metadata,
+        departments,
+    )
 
-	c.JSON(http.StatusOK, response)
+    c.JSON(http.StatusOK, response)
 }
 
 func (h *DepartmentHandler) GetAllDepartmentsGuest(c *gin.Context) {

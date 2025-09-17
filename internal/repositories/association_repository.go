@@ -51,7 +51,6 @@ func (r *AssociationRepository) FindByName(code string) (*models.Association, er
 	return &association, nil
 }
 
-// FindAll finds all associations
 // GetAllAssociations returns all associations from the database with optional search filter
 func (r *AssociationRepository) GetAllAssociations(limit, offset int, search string) ([]models.Association, int64, error) {
     var associations []models.Association

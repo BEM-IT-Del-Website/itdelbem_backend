@@ -51,22 +51,29 @@ func (r *DepartmentRepository) FindByName(code string) (*models.Department, erro
 	return &department, nil
 }
 
-// FindAll finds all departments
-func (r *DepartmentRepository) GetAllDepartments(limit, offset int) ([]models.Department, int64, error) {
+// GetAllAssociations returns all associations from the database with optional search filter
+func (r *DepartmentRepository) GetAllDepartments(limit, offset int, search string) ([]models.Department, int64, error) {
     var departments []models.Department
     var total int64
 
     query := r.db.Model(&models.Department{})
-    if err := query.Count(&total).Error; err != nil {
-        return nil, 0, err
+
+    if search != "" {
+        likeSearch := "%" + search + "%"
+        query = query.Where("name LIKE ?", likeSearch)
     }
 
-    if err := query.Limit(limit).Offset(offset).Find(&departments).Error; err != nil {
-        return nil, 0, err
-    }
+    query.Count(&total)
 
-    return departments, total, nil
+    result := query.
+        Order("name ASC").
+        Limit(limit).
+        Offset(offset).
+        Find(&departments)
+
+    return departments, total, result.Error
 }
+
 
 
 // DeleteByID deletes a department by ID
