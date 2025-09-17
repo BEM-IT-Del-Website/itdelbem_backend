@@ -71,6 +71,24 @@ func (h *ClubHandler) GetAllClubs(c *gin.Context) {
     c.JSON(http.StatusOK, response)
 }
 
+func (h *ClubHandler) GetAllClubsGuest(c *gin.Context) {
+    // ambil semua data tanpa limit & offset
+    clubs, err := h.service.GetAllClubsGuest()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
+        return
+    }
+
+    // langsung response tanpa metadata
+    response := utils.ResponseHandler(
+        "success",
+        "Berhasil mendapatkan data",
+        clubs,
+    )
+
+    c.JSON(http.StatusOK, response)
+}
+
 // GetClubByID returns a club by ID
 func (h *ClubHandler) GetClubByID(c *gin.Context) {
 	idStr := c.Param("id")
@@ -103,14 +121,14 @@ func (h *ClubHandler) GetClubByID(c *gin.Context) {
 
 // CreateClub creates a new club
 func (h *ClubHandler) CreateClub(c *gin.Context) {
-	var association models.Club
+	var club models.Club
 
 	// ambil field manual (biar gak coba bind file ke string)
-	association.Name = c.PostForm("name")
-	association.ShortName = c.PostForm("short_name")
-	association.Vision = c.PostForm("vision")
-	association.Mission = c.PostForm("mission")
-	association.Value = c.PostForm("value")
+	club.Name = c.PostForm("name")
+	club.ShortName = c.PostForm("short_name")
+	club.Vision = c.PostForm("vision")
+	club.Mission = c.PostForm("mission")
+	club.Value = c.PostForm("value")
 
 	// ambil file
 	file, err := c.FormFile("image")
@@ -120,7 +138,7 @@ func (h *ClubHandler) CreateClub(c *gin.Context) {
 	}
 
 	// kirim ke service
-	if err := h.service.CreateClub(&association, file); err != nil {
+	if err := h.service.CreateClub(&club, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -128,7 +146,7 @@ func (h *ClubHandler) CreateClub(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Club created successfully",
-		"data":    association,
+		"data":    club,
 	})
 }
 

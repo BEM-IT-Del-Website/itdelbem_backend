@@ -8,28 +8,14 @@ import (
 
 type Department struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
-	Name      string         `gorm:"not null" json:"name"`
-	ShortName string         `gorm:"not null" json:"shortname"`
-	Vision    string         `gorm:"not null" json:"vision"`
-	Mission   string         `gorm:"not null" json:"mission"`
-	Value     string         `gorm:"not null" json:"value"`
-	WorkPlan  string         `gorm:"not null" json:"workplan"`
+	Name      string         `form:"name" gorm:"not null" json:"name"`
+	ShortName string         `form:"short_name" gorm:"not null" json:"short_name"`
+	Vision    string         `form:"vision" gorm:"not null" json:"vision"`
+	Mission   string         `form:"mission" gorm:"not null" json:"mission"`
+	Value     string         `form:"value" gorm:"not null" json:"value"`
+	WorkPlan  string         `form:"workplan" gorm:"not null" json:"workplan"`
+	Image     string         `form:"image" json:"image" gorm:"type:text"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index;uniqueIndex:idx_courses_code_deleted_at" json:"deleted_at,omitempty"`
 }
-
-// Course represents a course in the system
-// type Department struct {
-// 	ID        uint           `gorm:"primaryKey" json:"id"`
-// 	Name      string         `gorm:"not null" json:"name"`
-// 	ShortName string         `gorm:"not null" json:"shortname"`
-// 	Vision    string         `gorm:"not null" json:"vision"`
-// 	Mission   string         `gorm:"not null" json:"mission"`
-// 	Value     string         `gorm:"not null" json:"value"`
-// 	WorkPlan  string         `gorm:"not null" json:"workplan"`
-// 	CreatedAt time.Time      `json:"created_at"`
-// 	UpdatedAt time.Time      `json:"updated_at"`
-// 	DeletedAt gorm.DeletedAt `gorm:"index;uniqueIndex:idx_courses_code_deleted_at" json:"deleted_at,omitempty"`
-// }
-

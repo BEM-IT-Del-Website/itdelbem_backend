@@ -125,3 +125,9 @@ func (r *DepartmentRepository) RestoreByName(code string) (*models.Department, e
 	
 // 	return count > 0, nil
 // } 
+
+func (r *DepartmentRepository) GetAllDepartmentsGuest() ([]models.Department, error) {
+    var associations []models.Department
+    err := r.db.Find(&associations).Error
+    return associations, err
+}

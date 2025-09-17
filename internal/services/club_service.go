@@ -28,13 +28,13 @@ func NewClubService(db *gorm.DB) *ClubService {
 // CreateClub creates a new club
 func (s *ClubService) CreateClub(association *models.Club, file *multipart.FileHeader) error {
 	// bikin folder kalau belum ada
-	if err := os.MkdirAll("uploads/clubs", os.ModePerm); err != nil {
+	if err := os.MkdirAll("uploads/departments", os.ModePerm); err != nil {
 		return err
 	}
 
 	// nama file unik
 	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
-	filepath := "uploads/clubs/" + filename
+	filepath := "uploads/departments/" + filename
 
 	// simpan file
 	if err := saveUploadedFile(file, filepath); err != nil {
@@ -71,6 +71,10 @@ func (s *ClubService) GetClubByID(id uint) (*models.Club, error) {
 // GetAllClubs gets all clubs
 func (s *ClubService) GetAllClubs(limit, offset int) ([]models.Club, int64, error) {
     return s.repository.GetAllClubs(limit, offset)
+}
+
+func (s *ClubService) GetAllClubsGuest() ([]models.Club, error) {
+    return s.repository.GetAllClubsGuest()
 }
 
 // DeleteClub deletes a club

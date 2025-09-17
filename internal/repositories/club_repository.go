@@ -125,3 +125,9 @@ func (r *ClubRepository) RestoreByName(code string) (*models.Club, error) {
 	
 // 	return count > 0, nil
 // } 
+
+func (r *ClubRepository) GetAllClubsGuest() ([]models.Club, error) {
+    var associations []models.Club
+    err := r.db.Find(&associations).Error
+    return associations, err
+}
