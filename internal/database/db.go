@@ -73,6 +73,20 @@ func Initialize() {
 	}
 	log.Println("User table migrated successfully")
 
+	// Himpunan
+	err = DB.AutoMigrate(&models.Category{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Category model: %v\n", err)
+	}
+	log.Println("Category table migrated successfully")
+
+	// Himpunan
+	err = DB.AutoMigrate(&models.Organization{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Organization model: %v\n", err)
+	}
+	log.Println("Organization table migrated successfully")
+
 	err = DB.AutoMigrate(&models.Student{})
 	if err != nil {
 		log.Fatalf("Error auto-migrating Student model: %v\n", err)
@@ -87,18 +101,6 @@ func Initialize() {
 		log.Fatalf("Error auto-migrating Department model: %v\n", err)
 	}
 	log.Println("Department table migrated successfully")
-
-	// err = DB.AutoMigrate(&models.DepartmentManagement{})
-	// if err != nil {
-	// 	log.Fatalf("Error auto-migrating DepartmentManagement model: %v\n", err)
-	// }
-	// log.Println("DepartmentManagement table migrated successfully")
-
-	// err = DB.AutoMigrate(&models.DepartmentWorkProgram{})
-	// if err != nil {
-	// 	log.Fatalf("Error auto-migrating DepartmentWorkProgram model: %v\n", err)
-	// }
-	// log.Println("DepartmentWorkProgram table migrated successfully")
 
 	// Himpunan
 	err = DB.AutoMigrate(&models.Association{})
@@ -202,6 +204,7 @@ func Initialize() {
 	log.Println("Galery table migrated successfully")
 
 	log.Println("Database schema migrated successfully")
+
 }
 
 // Close closes the database connection

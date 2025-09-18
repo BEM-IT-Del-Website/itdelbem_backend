@@ -60,16 +60,20 @@ type LoginRequest struct {
 
 // LoginResponse represents the login response body
 type LoginResponse struct {
-	User         User   `json:"user"`
-	Token        string `json:"token"`         // JWT token for authorization
-	RefreshToken string `json:"refresh_token"` // Field name must match frontend expectations
+	User           User   `json:"user"`
+	Token          string `json:"token"`         // JWT token for authorization
+	RefreshToken   string `json:"refresh_token"` // Field name must match frontend expectations
+	Position       string `json:"position"`
+	OrganizationID int    `json:"organization_id"`
 }
 
 // OrderedLoginResponse represents a login response with controlled field order
 type OrderedLoginResponse struct {
-	User         User   `json:"user"`
-	Token        string `json:"token"`
-	RefreshToken string `json:"refresh_token"`
+	User           User   `json:"user"`
+	Token          string `json:"token"`
+	RefreshToken   string `json:"refresh_token"`
+	Position       string `json:"position"`
+	OrganizationID int    `json:"organization_id"`
 }
 
 // RefreshRequest represents the refresh token request body

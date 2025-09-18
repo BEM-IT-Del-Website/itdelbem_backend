@@ -115,7 +115,7 @@ func (h *ClubHandler) GetClubByID(c *gin.Context) {
 
 // CreateClub creates a new club
 func (h *ClubHandler) CreateClub(c *gin.Context) {
-	var club models.Club
+	var club models.Organization
 
 	// ambil field manual (biar gak coba bind file ke string)
 	club.Name = c.PostForm("name")
@@ -123,6 +123,9 @@ func (h *ClubHandler) CreateClub(c *gin.Context) {
 	club.Vision = c.PostForm("vision")
 	club.Mission = c.PostForm("mission")
 	club.Value = c.PostForm("value")
+
+	club.CategoryID = 1
+
 
 	// ambil file
 	file, err := c.FormFile("image")
@@ -153,7 +156,7 @@ func (h *ClubHandler) UpdateClub(c *gin.Context) {
 		return
 	}
 
-	var club models.Club
+	var club models.Organization
 	if err := c.ShouldBindJSON(&club); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return

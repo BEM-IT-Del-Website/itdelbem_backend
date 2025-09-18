@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"fmt"
 	"log"
 	"os"
@@ -67,7 +66,6 @@ func main() {
 	// Create handlers
 	campusAuthHandler := handlers.NewCampusAuthHandler()
 
-
 	newsHandler := handlers.NewNewsHandler(database.DB)
 	studentHandler := handlers.NewStudentHandler(database.DB, campusAuthService)
 	associationHandler := handlers.NewAssociationHandler(database.DB)
@@ -91,7 +89,7 @@ func main() {
 
 		// Admin routes
 		adminRoutes := authRequired.Group("/admin")
-		adminRoutes.Use(middleware.RoleMiddleware("Admin"))
+		adminRoutes.Use(middleware.RoleMiddleware("Admin, Mahasiswa"))
 		{
 			// Campus API token management (admin only)
 			adminRoutes.GET("/campus/token", campusAuthHandler.GetToken)
@@ -102,6 +100,7 @@ func main() {
 			adminRoutes.GET("/students/:id", studentHandler.GetStudentByID)
 			adminRoutes.GET("/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)
 			adminRoutes.POST("/students/sync", studentHandler.SyncStudents)
+			adminRoutes.PUT("/students/:id/assign", studentHandler.AssignStudent)
 
 			adminRoutes.GET("/news", newsHandler.GetAllNews)
 			adminRoutes.GET("/news/:id", newsHandler.GetNewsByID)

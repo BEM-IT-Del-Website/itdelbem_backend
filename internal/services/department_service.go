@@ -26,15 +26,15 @@ func NewDepartmentService(db *gorm.DB) *DepartmentService {
 }
 
 // CreateDepartment creates a new department
-func (s *DepartmentService) CreateDepartment(association *models.Department, file *multipart.FileHeader) error {
+func (s *DepartmentService) CreateDepartment(department *models.Organization, file *multipart.FileHeader) error {
 	// bikin folder kalau belum ada
-	if err := os.MkdirAll("uploads/clubs", os.ModePerm); err != nil {
+	if err := os.MkdirAll("uploads/departments", os.ModePerm); err != nil {
 		return err
 	}
 
 	// nama file unik
 	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
-	filepath := "uploads/clubs/" + filename
+	filepath := "uploads/departments/" + filename
 
 	// simpan file
 	if err := saveUploadedFile(file, filepath); err != nil {
@@ -42,14 +42,14 @@ func (s *DepartmentService) CreateDepartment(association *models.Department, fil
 	}
 
 	// simpan path/filename ke struct
-	association.Image = filename
+	department.Image = filename
 
 	// simpan ke DB
-	return s.repository.Create(association)
+	return s.repository.Create(department)
 }
 
 // UpdateDepartment updates an existing department
-func (s *DepartmentService) UpdateDepartment(department *models.Department) error {
+func (s *DepartmentService) UpdateDepartment(department *models.Organization) error {
 	// Check if department exists
 	existingDepartment, err := s.repository.FindByID(department.ID)
 	if err != nil {
@@ -64,16 +64,16 @@ func (s *DepartmentService) UpdateDepartment(department *models.Department) erro
 }
 
 // GetDepartmentByID gets a department by ID
-func (s *DepartmentService) GetDepartmentByID(id uint) (*models.Department, error) {
+func (s *DepartmentService) GetDepartmentByID(id uint) (*models.Organization, error) {
 	return s.repository.FindByID(id)
 }
 
 // GetAllDepartments gets all departments
-func (s *DepartmentService) GetAllDepartments(limit, offset int, search string) ([]models.Department, int64, error) {
+func (s *DepartmentService) GetAllDepartments(limit, offset int, search string) ([]models.Organization, int64, error) {
     return s.repository.GetAllDepartments(limit, offset, search)
 }
 
-func (s *DepartmentService) GetAllDepartmentsGuest() ([]models.Department, error) {
+func (s *DepartmentService) GetAllDepartmentsGuest() ([]models.Organization, error) {
     return s.repository.GetAllDepartmentsGuest()
 }
 
@@ -94,7 +94,7 @@ func (s *DepartmentService) DeleteDepartment(id uint) error {
 
 // DepartmentWithStats represents a department with additional statistics
 type DepartmentWithStats struct {
-	Department  models.Department `json:"department"`
+	Department  models.Organization `json:"department"`
 	RoomCount int64           `json:"room_count"`
 }
 

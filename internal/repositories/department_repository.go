@@ -19,18 +19,18 @@ func NewDepartmentRepository() *DepartmentRepository {
 }
 
 // Create creates a new department
-func (r *DepartmentRepository) Create(department *models.Department) error {
+func (r *DepartmentRepository) Create(department *models.Organization) error {
 	return r.db.Create(department).Error
 }
 
 // Update updates an existing department
-func (r *DepartmentRepository) Update(department *models.Department) error {
+func (r *DepartmentRepository) Update(department *models.Organization) error {
 	return r.db.Save(department).Error
 }
 
 // FindByID finds a department by ID
-func (r *DepartmentRepository) FindByID(id uint) (*models.Department, error) {
-	var department models.Department
+func (r *DepartmentRepository) FindByID(id uint) (*models.Organization, error) {
+	var department models.Organization
 	err := r.db.First(&department, id).Error
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (r *DepartmentRepository) FindByID(id uint) (*models.Department, error) {
 }
 
 // FindByName finds a department by code
-func (r *DepartmentRepository) FindByName(code string) (*models.Department, error) {
-	var department models.Department
+func (r *DepartmentRepository) FindByName(code string) (*models.Organization, error) {
+	var department models.Organization
 	err := r.db.Where("code = ?", code).First(&department).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -52,11 +52,11 @@ func (r *DepartmentRepository) FindByName(code string) (*models.Department, erro
 }
 
 // GetAllAssociations returns all associations from the database with optional search filter
-func (r *DepartmentRepository) GetAllDepartments(limit, offset int, search string) ([]models.Department, int64, error) {
-    var departments []models.Department
+func (r *DepartmentRepository) GetAllDepartments(limit, offset int, search string) ([]models.Organization, int64, error) {
+    var departments []models.Organization
     var total int64
 
-    query := r.db.Model(&models.Department{})
+    query := r.db.Model(&models.Organization{}).Where("category_id = ?", 2)
 
     if search != "" {
         likeSearch := "%" + search + "%"
@@ -79,12 +79,12 @@ func (r *DepartmentRepository) GetAllDepartments(limit, offset int, search strin
 // DeleteByID deletes a department by ID
 func (r *DepartmentRepository) DeleteByID(id uint) error {
 	// Use soft delete (don't use Unscoped())
-	return r.db.Delete(&models.Department{}, id).Error
+	return r.db.Delete(&models.Organization{}, id).Error
 }
 
 // FindDeletedByName finds a soft-deleted department by code
-func (r *DepartmentRepository) FindDeletedByName(code string) (*models.Department, error) {
-	var department models.Department
+func (r *DepartmentRepository) FindDeletedByName(code string) (*models.Organization, error) {
+	var department models.Organization
 	err := r.db.Unscoped().Where("code = ? AND deleted_at IS NOT NULL", code).First(&department).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -96,7 +96,7 @@ func (r *DepartmentRepository) FindDeletedByName(code string) (*models.Departmen
 }
 
 // RestoreByName restores a soft-deleted department by code
-func (r *DepartmentRepository) RestoreByName(code string) (*models.Department, error) {
+func (r *DepartmentRepository) RestoreByName(code string) (*models.Organization, error) {
 	// Find the deleted record
 	deletedDepartment, err := r.FindDeletedByName(code)
 	if err != nil {
@@ -107,7 +107,7 @@ func (r *DepartmentRepository) RestoreByName(code string) (*models.Department, e
 	}
 	
 	// Restore the record
-	if err := r.db.Unscoped().Model(&models.Department{}).Where("id = ?", deletedDepartment.ID).Update("deleted_at", nil).Error; err != nil {
+	if err := r.db.Unscoped().Model(&models.Organization{}).Where("id = ?", deletedDepartment.ID).Update("deleted_at", nil).Error; err != nil {
 		return nil, err
 	}
 	
@@ -118,7 +118,7 @@ func (r *DepartmentRepository) RestoreByName(code string) (*models.Department, e
 // // CheckNameExists checks if a code exists, including soft-deleted records
 // func (r *DepartmentRepository) CheckNameExists(code string, excludeID uint) (bool, error) {
 // 	var count int64
-// 	query := r.db.Unscoped().Model(&models.Department{}).Where("code = ?", code)
+// 	query := r.db.Unscoped().Model(&models.Organization{}).Where("code = ?", code)
 	
 // 	// Exclude the current record if updating
 // 	if excludeID > 0 {
@@ -133,8 +133,8 @@ func (r *DepartmentRepository) RestoreByName(code string) (*models.Department, e
 // 	return count > 0, nil
 // } 
 
-func (r *DepartmentRepository) GetAllDepartmentsGuest() ([]models.Department, error) {
-    var associations []models.Department
-    err := r.db.Find(&associations).Error
+func (r *DepartmentRepository) GetAllDepartmentsGuest() ([]models.Organization, error) {
+    var associations []models.Organization
+    err := r.db.Where("category_id = ?", 2).Find(&associations).Error
     return associations, err
 }

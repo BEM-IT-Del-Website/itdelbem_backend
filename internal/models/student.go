@@ -12,6 +12,8 @@ type Student struct {
 	DimID          int            `json:"dim_id" gorm:"not null"`
 	UserID         int            `json:"user_id" gorm:"not null;comment:External user ID from campus system"`
 	User           *User          `json:"-" gorm:"foreignKey:ExternalUserID;references:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	OrganizationID int            `form:"organization_id" json:"organization_id" gorm:"not null"`
+	Organization   *Organization  `json:"organization" gorm:"foreignKey:ID;references:OrganizationID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserName       string         `json:"user_name" gorm:"type:varchar(20)"`
 	NIM            string         `json:"nim" gorm:"type:varchar(20);uniqueIndex;not null"`
 	FullName       string         `json:"full_name" gorm:"type:varchar(100);not null"`

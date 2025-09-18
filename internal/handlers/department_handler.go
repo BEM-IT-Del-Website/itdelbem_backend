@@ -115,7 +115,7 @@ func (h *DepartmentHandler) GetDepartmentByID(c *gin.Context) {
 
 // CreateDepartment creates a new department
 func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
-	var department models.Department
+	var department models.Organization
 
 	// ambil field manual (biar gak coba bind file ke string)
 	department.Name = c.PostForm("name")
@@ -123,6 +123,7 @@ func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
 	department.Vision = c.PostForm("vision")
 	department.Mission = c.PostForm("mission")
 	department.Value = c.PostForm("value")
+	department.CategoryID = 2
 
 	// ambil file
 	file, err := c.FormFile("image")
@@ -152,7 +153,7 @@ func (h *DepartmentHandler) UpdateDepartment(c *gin.Context) {
 		return
 	}
 
-	var department models.Department
+	var department models.Organization
 	if err := c.ShouldBindJSON(&department); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return

@@ -19,18 +19,18 @@ func NewClubRepository() *ClubRepository {
 }
 
 // Create creates a new club
-func (r *ClubRepository) Create(club *models.Club) error {
+func (r *ClubRepository) Create(club *models.Organization) error {
 	return r.db.Create(club).Error
 }
 
 // Update updates an existing club
-func (r *ClubRepository) Update(club *models.Club) error {
+func (r *ClubRepository) Update(club *models.Organization) error {
 	return r.db.Save(club).Error
 }
 
 // FindByID finds a club by ID
-func (r *ClubRepository) FindByID(id uint) (*models.Club, error) {
-	var club models.Club
+func (r *ClubRepository) FindByID(id uint) (*models.Organization, error) {
+	var club models.Organization
 	err := r.db.First(&club, id).Error
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (r *ClubRepository) FindByID(id uint) (*models.Club, error) {
 }
 
 // FindByName finds a club by code
-func (r *ClubRepository) FindByName(code string) (*models.Club, error) {
-	var club models.Club
+func (r *ClubRepository) FindByName(code string) (*models.Organization, error) {
+	var club models.Organization
 	err := r.db.Where("code = ?", code).First(&club).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -52,11 +52,11 @@ func (r *ClubRepository) FindByName(code string) (*models.Club, error) {
 }
 
 // FindAll finds all clubs
-func (r *ClubRepository) GetAllClubs(limit, offset int, search string) ([]models.Club, int64, error) {
-    var clubs []models.Club
+func (r *ClubRepository) GetAllClubs(limit, offset int, search string) ([]models.Organization, int64, error) {
+    var clubs []models.Organization
     var total int64
 
-    query := r.db.Model(&models.Club{})
+    query := r.db.Model(&models.Organization{}).Where("category_id = ?", 1)
 
     if search != "" {
         likeSearch := "%" + search + "%"
@@ -78,12 +78,12 @@ func (r *ClubRepository) GetAllClubs(limit, offset int, search string) ([]models
 // DeleteByID deletes a club by ID
 func (r *ClubRepository) DeleteByID(id uint) error {
 	// Use soft delete (don't use Unscoped())
-	return r.db.Delete(&models.Club{}, id).Error
+	return r.db.Delete(&models.Organization{}, id).Error
 }
 
 // FindDeletedByName finds a soft-deleted club by code
-func (r *ClubRepository) FindDeletedByName(code string) (*models.Club, error) {
-	var club models.Club
+func (r *ClubRepository) FindDeletedByName(code string) (*models.Organization, error) {
+	var club models.Organization
 	err := r.db.Unscoped().Where("code = ? AND deleted_at IS NOT NULL", code).First(&club).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -95,7 +95,7 @@ func (r *ClubRepository) FindDeletedByName(code string) (*models.Club, error) {
 }
 
 // RestoreByName restores a soft-deleted club by code
-func (r *ClubRepository) RestoreByName(code string) (*models.Club, error) {
+func (r *ClubRepository) RestoreByName(code string) (*models.Organization, error) {
 	// Find the deleted record
 	deletedClub, err := r.FindDeletedByName(code)
 	if err != nil {
@@ -106,7 +106,7 @@ func (r *ClubRepository) RestoreByName(code string) (*models.Club, error) {
 	}
 	
 	// Restore the record
-	if err := r.db.Unscoped().Model(&models.Club{}).Where("id = ?", deletedClub.ID).Update("deleted_at", nil).Error; err != nil {
+	if err := r.db.Unscoped().Model(&models.Organization{}).Where("id = ?", deletedClub.ID).Update("deleted_at", nil).Error; err != nil {
 		return nil, err
 	}
 	
@@ -117,7 +117,7 @@ func (r *ClubRepository) RestoreByName(code string) (*models.Club, error) {
 // // CheckNameExists checks if a code exists, including soft-deleted records
 // func (r *ClubRepository) CheckNameExists(code string, excludeID uint) (bool, error) {
 // 	var count int64
-// 	query := r.db.Unscoped().Model(&models.Club{}).Where("code = ?", code)
+// 	query := r.db.Unscoped().Model(&models.Organization{}).Where("code = ?", code)
 	
 // 	// Exclude the current record if updating
 // 	if excludeID > 0 {
@@ -132,8 +132,8 @@ func (r *ClubRepository) RestoreByName(code string) (*models.Club, error) {
 // 	return count > 0, nil
 // } 
 
-func (r *ClubRepository) GetAllClubsGuest() ([]models.Club, error) {
-    var associations []models.Club
-    err := r.db.Find(&associations).Error
-    return associations, err
+func (r *ClubRepository) GetAllClubsGuest() ([]models.Organization, error) {
+    var clubs []models.Organization
+    err := r.db.Where("category_id = ?", 1).Find(&clubs).Error
+    return clubs, err
 }

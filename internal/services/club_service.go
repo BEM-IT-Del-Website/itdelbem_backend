@@ -26,15 +26,15 @@ func NewClubService(db *gorm.DB) *ClubService {
 }
 
 // CreateClub creates a new club
-func (s *ClubService) CreateClub(association *models.Club, file *multipart.FileHeader) error {
+func (s *ClubService) CreateClub(association *models.Organization, file *multipart.FileHeader) error {
 	// bikin folder kalau belum ada
-	if err := os.MkdirAll("uploads/departments", os.ModePerm); err != nil {
+	if err := os.MkdirAll("uploads/clubs", os.ModePerm); err != nil {
 		return err
 	}
 
 	// nama file unik
 	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
-	filepath := "uploads/departments/" + filename
+	filepath := "uploads/clubs/" + filename
 
 	// simpan file
 	if err := saveUploadedFile(file, filepath); err != nil {
@@ -49,7 +49,7 @@ func (s *ClubService) CreateClub(association *models.Club, file *multipart.FileH
 }
 
 // UpdateClub updates an existing club
-func (s *ClubService) UpdateClub(club *models.Club) error {
+func (s *ClubService) UpdateClub(club *models.Organization) error {
 	// Check if club exists
 	existingClub, err := s.repository.FindByID(club.ID)
 	if err != nil {
@@ -64,17 +64,17 @@ func (s *ClubService) UpdateClub(club *models.Club) error {
 }
 
 // GetClubByID gets a club by ID
-func (s *ClubService) GetClubByID(id uint) (*models.Club, error) {
+func (s *ClubService) GetClubByID(id uint) (*models.Organization, error) {
 	return s.repository.FindByID(id)
 }
 
 // GetAllClubs gets all clubs
-func (s *ClubService) GetAllClubs(limit, offset int, search string) ([]models.Club, int64, error) {
+func (s *ClubService) GetAllClubs(limit, offset int, search string) ([]models.Organization, int64, error) {
     return s.repository.GetAllClubs(limit, offset,search)
 }
 
 
-func (s *ClubService) GetAllClubsGuest() ([]models.Club, error) {
+func (s *ClubService) GetAllClubsGuest() ([]models.Organization, error) {
     return s.repository.GetAllClubsGuest()
 }
 
@@ -95,7 +95,7 @@ func (s *ClubService) DeleteClub(id uint) error {
 
 // ClubWithStats represents a club with additional statistics
 type ClubWithStats struct {
-	Club  models.Club `json:"club"`
+	Club  models.Organization `json:"club"`
 	RoomCount int64           `json:"room_count"`
 }
 

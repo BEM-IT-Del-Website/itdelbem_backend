@@ -3,11 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
 	"bem_be/internal/auth"
 	"bem_be/internal/models"
+	"bem_be/internal/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,11 +60,23 @@ func CampusLogin(c *gin.Context) {
 	log.Printf("Response token length: %d, refresh token length: %d",
 		len(loginResponse.Token), len(loginResponse.RefreshToken))
 
+	studentRepo := repositories.NewStudentRepository()
+	student, err := studentRepo.FindByExternalUserUsername(loginResponse.User.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch student"})
+		return
+	}
+
+	fmt.Println("Student username:", student.UserName)
+	fmt.Println("External user username:", loginResponse.User.Username)
+
 	// Use custom response struct to ensure the correct field order
 	orderedResponse := models.OrderedLoginResponse{
 		User:         loginResponse.User,
 		Token:        loginResponse.Token,
 		RefreshToken: loginResponse.RefreshToken,
+		Position:       student.Position,
+		OrganizationID: student.OrganizationID,
 	}
 
 	// Set content type

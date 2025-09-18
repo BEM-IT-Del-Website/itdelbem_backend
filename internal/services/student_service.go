@@ -189,3 +189,21 @@ func (s *StudentService) fetchStudentsFromCampus(token string) ([]models.CampusS
 	log.Printf("Successfully fetched %d students from campus API", len(campusResp.Data.Students))
 	return campusResp.Data.Students, nil
 }
+
+func (s *StudentService) AssignStudent(id uint, orgID int, role string) (*models.Student, error) {
+	student, err := s.repository.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// update data yang di-assign
+	student.OrganizationID = orgID
+	student.Position = role
+
+	if err := s.repository.Update(student); err != nil {
+		return nil, err
+	}
+
+	return student, nil
+}
+

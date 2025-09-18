@@ -115,14 +115,17 @@ func (h *AssociationHandler) GetAssociationByID(c *gin.Context) {
 // CreateAssociation creates a new association
 // CreateAssociation creates a new association
 func (h *AssociationHandler) CreateAssociation(c *gin.Context) {
-	var association models.Association
+	var association models.Organization
 
 	// ambil field manual (biar gak coba bind file ke string)
 	association.Name = c.PostForm("name")
 	association.ShortName = c.PostForm("short_name")
 	association.Vision = c.PostForm("vision")
 	association.Mission = c.PostForm("mission")
-	association.Values = c.PostForm("values")
+	association.Value = c.PostForm("values")
+
+	association.CategoryID = 3
+
 
 	// ambil file
 	file, err := c.FormFile("image")
@@ -153,7 +156,7 @@ func (h *AssociationHandler) UpdateAssociation(c *gin.Context) {
 		return
 	}
 
-	var association models.Association
+	var association models.Organization
 	if err := c.ShouldBindJSON(&association); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return

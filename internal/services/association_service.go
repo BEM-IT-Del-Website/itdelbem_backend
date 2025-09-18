@@ -26,7 +26,7 @@ func NewAssociationService(db *gorm.DB) *AssociationService {
 }
 
 // CreateAssociation creates a new association
-func (s *AssociationService) CreateAssociation(association *models.Association, file *multipart.FileHeader) error {
+func (s *AssociationService) CreateAssociation(association *models.Organization, file *multipart.FileHeader) error {
 	// bikin folder kalau belum ada
 	if err := os.MkdirAll("uploads/associations", os.ModePerm); err != nil {
 		return err
@@ -67,7 +67,7 @@ func saveUploadedFile(file *multipart.FileHeader, dst string) error {
 }
 
 // UpdateAssociation updates an existing association
-func (s *AssociationService) UpdateAssociation(association *models.Association) error {
+func (s *AssociationService) UpdateAssociation(association *models.Organization) error {
 	// Check if association exists
 	existingAssociation, err := s.repository.FindByID(association.ID)
 	if err != nil {
@@ -82,17 +82,17 @@ func (s *AssociationService) UpdateAssociation(association *models.Association) 
 }
 
 // GetAssociationByID gets a association by ID
-func (s *AssociationService) GetAssociationByID(id uint) (*models.Association, error) {
+func (s *AssociationService) GetAssociationByID(id uint) (*models.Organization, error) {
 	return s.repository.FindByID(id)
 }
 
 // GetAllAssociations gets all associations
-func (s *AssociationService) GetAllAssociations(limit, offset int, search string) ([]models.Association, int64, error) {
+func (s *AssociationService) GetAllAssociations(limit, offset int, search string) ([]models.Organization, int64, error) {
     return s.repository.GetAllAssociations(limit, offset, search)
 }
 
 
-func (s *AssociationService) GetAllAssociationsGuest() ([]models.Association, error) {
+func (s *AssociationService) GetAllAssociationsGuest() ([]models.Organization, error) {
     return s.repository.GetAllAssociationsGuest()
 }
 
@@ -113,7 +113,7 @@ func (s *AssociationService) DeleteAssociation(id uint) error {
 
 // AssociationWithStats represents a association with additional statistics
 type AssociationWithStats struct {
-	Association  models.Association `json:"association"`
+	Association  models.Organization `json:"association"`
 	RoomCount int64           `json:"room_count"`
 }
 

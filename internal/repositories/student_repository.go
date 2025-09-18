@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"log"
+	"errors"
 
 	"bem_be/internal/database"
 	"bem_be/internal/models"
@@ -19,6 +20,13 @@ func NewStudentRepository() *StudentRepository {
 	return &StudentRepository{
 		db: database.GetDB(),
 	}
+}
+
+func (r *StudentRepository) Update(student *models.Student) error {
+	if student.ID == 0 {
+		return errors.New("student ID is required")
+	}
+	return r.db.Save(student).Error
 }
 
 // FindAll returns all students from the database with optional search and filters
@@ -149,3 +157,12 @@ func (r *StudentRepository) UpsertMany(students []models.Student) error {
 	log.Printf("Upserted %d students", len(students))
 	return tx.Commit().Error
 }
+
+func (r *StudentRepository) FindByExternalUserUsername(username string) (*models.Student, error) {
+	var student models.Student
+	if err := r.db.Where("user_name = ?", username).First(&student).Error; err != nil {
+		return nil, err
+	}
+	return &student, nil
+}
+

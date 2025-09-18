@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
-	"math"
+
 	"gorm.io/gorm"
 
 	"bem_be/internal/services"
@@ -20,56 +21,55 @@ type StudentHandler struct {
 
 // NewStudentHandler creates a new student handler
 func NewStudentHandler(db *gorm.DB, campusAuth *services.CampusAuthService) *StudentHandler {
-    return &StudentHandler{
-        service: services.NewStudentService(db, campusAuth),
-    }
+	return &StudentHandler{
+		service: services.NewStudentService(db, campusAuth),
+	}
 }
+
 func (h *StudentHandler) GetAllStudents(c *gin.Context) {
-    page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-    perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
 
-    // ambil query params
-    search := c.Query("name") // pakai param "name" untuk search
-    studyProgram := c.Query("study_program")
-    yearEnrolledStr := c.Query("year_enrolled")
-    yearEnrolled, _ := strconv.Atoi(yearEnrolledStr) // default 0 kalau kosong / invalid
+	// ambil query params
+	search := c.Query("name") // pakai param "name" untuk search
+	studyProgram := c.Query("study_program")
+	yearEnrolledStr := c.Query("year_enrolled")
+	yearEnrolled, _ := strconv.Atoi(yearEnrolledStr) // default 0 kalau kosong / invalid
 
-    if page < 1 {
-        page = 1
-    }
-    if perPage < 1 {
-        perPage = 10
-    }
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 {
+		perPage = 10
+	}
 
-    offset := (page - 1) * perPage
+	offset := (page - 1) * perPage
 
-    // lempar semua filter ke service
-    students, total, err := h.service.GetAllStudents(perPage, offset, search, studyProgram, yearEnrolled)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
-        return
-    }
+	// lempar semua filter ke service
+	students, total, err := h.service.GetAllStudents(perPage, offset, search, studyProgram, yearEnrolled)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseHandler("error", err.Error(), nil))
+		return
+	}
 
-    totalPages := int(math.Ceil(float64(total) / float64(perPage)))
+	totalPages := int(math.Ceil(float64(total) / float64(perPage)))
 
-    metadata := utils.PaginationMetadata{
-        CurrentPage: page,
-        PerPage:     perPage,
-        TotalItems:  int(total),
-        TotalPages:  totalPages,
-    }
+	metadata := utils.PaginationMetadata{
+		CurrentPage: page,
+		PerPage:     perPage,
+		TotalItems:  int(total),
+		TotalPages:  totalPages,
+	}
 
-    response := utils.MetadataFormatResponse(
-        "success",
-        "Berhasil list mendapatkan data",
-        metadata,
-        students,
-    )
+	response := utils.MetadataFormatResponse(
+		"success",
+		"Berhasil list mendapatkan data",
+		metadata,
+		students,
+	)
 
-    c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, response)
 }
-
-
 
 // GetStudentByID returns a student by ID
 func (h *StudentHandler) GetStudentByID(c *gin.Context) {
@@ -153,4 +153,30 @@ func (h *StudentHandler) SyncStudents(c *gin.Context) {
 			"count": count,
 		},
 	})
+}
+
+func (h *StudentHandler) AssignStudent(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid student ID"})
+		return
+	}
+
+	var body struct {
+		OrganizationID int    `json:"organization_id"`
+		Role           string `json:"role"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	student, err := h.service.AssignStudent(uint(id), body.OrganizationID, body.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, student)
 }
