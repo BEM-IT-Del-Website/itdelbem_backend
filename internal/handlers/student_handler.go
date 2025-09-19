@@ -164,19 +164,37 @@ func (h *StudentHandler) AssignStudent(c *gin.Context) {
 	}
 
 	var body struct {
-		OrganizationID int    `json:"organization_id"`
-		Role           string `json:"role"`
+		OrganizationID        int    `json:"organization_id"`
+		OrganizationShortName string `json:"organization_shortname"`
+		PositionTitle         string `json:"position_title"`
+		Role                  string `json:"role"`
+		Category              string `json:"category"`
+		Period                string `json:"period"` // period ikut ditampung
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	student, err := h.service.AssignStudent(uint(id), body.OrganizationID, body.Role)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	var result interface{}
 
-	c.JSON(http.StatusOK, student)
+	switch strings.ToLower(body.Category) {
+	case "bem":
+		// masuk ke model BEM
+		bem, err := h.service.AssignToBem(uint(id), body.Role, body.PositionTitle, body.Period)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		result = bem
+
+	default:
+		period, err := h.service.AssignToPeriod(uint(id), body.OrganizationID, body.Role, body.Period)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		result = period
+	}
+	c.JSON(http.StatusOK, result)
 }

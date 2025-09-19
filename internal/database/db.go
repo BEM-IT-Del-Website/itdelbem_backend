@@ -93,53 +93,6 @@ func Initialize() {
 	}
 	log.Println("Student table migrated successfully")
 
-	// Lanjutkan migrasi model lain seperti Course, StudentGroup, dll sesuai urutan versi PostgreSQL
-
-	// Departemen
-	err = DB.AutoMigrate(&models.Department{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Department model: %v\n", err)
-	}
-	log.Println("Department table migrated successfully")
-
-	// Himpunan
-	err = DB.AutoMigrate(&models.Association{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Association model: %v\n", err)
-	}
-	log.Println("Association table migrated successfully")
-
-	err = DB.AutoMigrate(&models.AssociationManagement{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating AssociationManagement model: %v\n", err)
-	}
-	log.Println("AssociationManagement table migrated successfully")
-
-	err = DB.AutoMigrate(&models.AssociationWorkProgram{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating AssociationManagement model: %v\n", err)
-	}
-	log.Println("AssociationWorkProgram table migrated successfully")
-
-	// UKM
-	err = DB.AutoMigrate(&models.Ukm{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating UKM model: %v\n", err)
-	}
-	log.Println("UKM table migrated successfully")
-
-	err = DB.AutoMigrate(&models.UkmManagement{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating UkmManagement model: %v\n", err)
-	}
-	log.Println("UkmManagement table migrated successfully")
-
-	err = DB.AutoMigrate(&models.UkmWorkProgram{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating UkmWorkProgram model: %v\n", err)
-	}
-	log.Println("UkmWorkProgram table migrated successfully")
-
 	// BEM
 	err = DB.AutoMigrate(&models.BEM{})
 	if err != nil {
@@ -186,14 +139,6 @@ func Initialize() {
 		log.Fatalf("Error auto-migrating Aspiration model: %v\n", err)
 	}
 	log.Println("Aspiration table migrated successfully")
-
-	log.Println("Database schema migrated successfully")
-
-	err = DB.AutoMigrate(&models.Club{})
-	if err != nil {
-		log.Fatalf("Error auto-migrating Club model: %v\n", err)
-	}
-	log.Println("Club table migrated successfully")
 
 	log.Println("Database schema migrated successfully")
 

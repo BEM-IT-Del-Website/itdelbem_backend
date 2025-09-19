@@ -120,9 +120,7 @@ func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
 	// ambil field manual (biar gak coba bind file ke string)
 	department.Name = c.PostForm("name")
 	department.ShortName = c.PostForm("short_name")
-	department.Vision = c.PostForm("vision")
-	department.Mission = c.PostForm("mission")
-	department.Value = c.PostForm("value")
+	
 	department.CategoryID = 2
 
 	// ambil file

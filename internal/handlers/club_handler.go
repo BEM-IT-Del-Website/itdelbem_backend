@@ -120,10 +120,7 @@ func (h *ClubHandler) CreateClub(c *gin.Context) {
 	// ambil field manual (biar gak coba bind file ke string)
 	club.Name = c.PostForm("name")
 	club.ShortName = c.PostForm("short_name")
-	club.Vision = c.PostForm("vision")
-	club.Mission = c.PostForm("mission")
-	club.Value = c.PostForm("value")
-
+	
 	club.CategoryID = 1
 
 

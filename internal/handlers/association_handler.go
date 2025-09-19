@@ -120,9 +120,6 @@ func (h *AssociationHandler) CreateAssociation(c *gin.Context) {
 	// ambil field manual (biar gak coba bind file ke string)
 	association.Name = c.PostForm("name")
 	association.ShortName = c.PostForm("short_name")
-	association.Vision = c.PostForm("vision")
-	association.Mission = c.PostForm("mission")
-	association.Value = c.PostForm("values")
 
 	association.CategoryID = 3
 
