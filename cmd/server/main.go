@@ -89,7 +89,7 @@ func main() {
 
 		// Admin routes
 		adminRoutes := authRequired.Group("/admin")
-		adminRoutes.Use(middleware.RoleMiddleware("Admin, Mahasiswa"))
+		adminRoutes.Use(middleware.RoleMiddleware("Admin"))
 		{
 			// Campus API token management (admin only)
 			adminRoutes.GET("/campus/token", campusAuthHandler.GetToken)
