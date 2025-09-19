@@ -9,15 +9,19 @@ import (
 // BEM represents the main student executive board for a specific period.
 type BEM struct {
 	ID           uint           `json:"id" gorm:"primaryKey"`
-	LeaderID     uint           `json:"leader_id" gorm:"not null"`
-	Leader       *User          `json:"leader,omitempty" gorm:"foreignKey:LeaderID"`
-	CoLeaderID   *uint          `json:"co_leader_id"`
-	CoLeader     *User          `json:"co_leader,omitempty" gorm:"foreignKey:CoLeaderID"`
-	Secretary1ID *uint          `json:"secretary_1_id"`
-	Secretary2ID *uint          `json:"secretary_2_id"`
-	Treasurer1ID *uint          `json:"treasurer_1_id"`
-	Treasurer2ID *uint          `json:"treasurer_2_id"`
-	Period       string         `json:"period" gorm:"type:varchar(20);not null;unique"`
+	LeaderID     uint           `json:"leader_id"`
+	Leader       *Student       `json:"leader" gorm:"foreignKey:ID;references:LeaderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CoLeaderID   uint           `json:"coleader_id"`
+	CoLeader     *Student       `json:"coleader" gorm:"foreignKey:ID;references:CoLeaderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Secretary1ID uint           `json:"secretary1_id"`
+	Secretary1   *Student       `json:"secretary1" gorm:"foreignKey:ID;references:Secretary1;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Secretary2ID uint           `json:"secretary_id"`
+	Secretary2   *Student       `json:"secretary" gorm:"foreignKey:ID;references:Secretary2ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Treasurer1ID uint           `json:"treasurer1_id"`
+	Treasurer1   *Student       `json:"treasurer1" gorm:"foreignKey:ID;references:Treasurer1ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Treasurer2ID uint           `json:"treasurer2_id"`
+	Treasurer2   *Student       `json:"treasurer2" gorm:"foreignKey:ID;references:Treasurer2ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Period       string         `json:"period" gorm:"type:varchar(20);not null"`
 	CreatedAt    time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt    time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`

@@ -166,3 +166,15 @@ func (r *StudentRepository) FindByExternalUserUsername(username string) (*models
 	return &student, nil
 }
 
+func (r *StudentRepository) GetBemByOrganizationID(orgID int, bem *models.BEM) error {
+	return r.db.Where("id = ?", orgID).First(bem).Error
+}
+
+func (r *StudentRepository) UpdateBem(bem *models.BEM) error {
+	return r.db.Save(bem).Error
+}
+
+func (r *StudentRepository) SavePeriod(period *models.Period) error {
+	return r.db.Create(period).Error
+}
+

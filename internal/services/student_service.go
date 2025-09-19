@@ -1,7 +1,6 @@
 package services
 
 import (
-	"gorm.io/gorm"
 	"context"
 	"encoding/json"
 	"errors"
@@ -12,6 +11,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 
 	"bem_be/internal/models"
 	"bem_be/internal/repositories"
@@ -25,20 +26,20 @@ const (
 type StudentService struct {
 	repository *repositories.StudentRepository
 	campusAuth *CampusAuthService
-	db *gorm.DB
+	db         *gorm.DB
 }
 
 // NewStudentService creates a new student service
 func NewStudentService(db *gorm.DB, campusAuth *CampusAuthService) *StudentService {
-    return &StudentService{
-        repository: repositories.NewStudentRepository(),
-        db:         db,
-        campusAuth: campusAuth,
-    }
+	return &StudentService{
+		repository: repositories.NewStudentRepository(),
+		db:         db,
+		campusAuth: campusAuth,
+	}
 }
 
 func (s *StudentService) GetAllStudents(limit, offset int, search, studyProgram string, yearEnrolled int) ([]models.Student, int64, error) {
-    return s.repository.FindAll(limit, offset, search, studyProgram, yearEnrolled)
+	return s.repository.FindAll(limit, offset, search, studyProgram, yearEnrolled)
 }
 
 // GetStudentByID returns a student by ID
@@ -190,20 +191,92 @@ func (s *StudentService) fetchStudentsFromCampus(token string) ([]models.CampusS
 	return campusResp.Data.Students, nil
 }
 
-func (s *StudentService) AssignStudent(id uint, orgID int, role string) (*models.Student, error) {
-	student, err := s.repository.FindByID(id)
-	if err != nil {
+func (s *StudentService) AssignToBem(studentID uint, role, positionTitle, periode string) (*models.BEM, error) {
+	var bem models.BEM
+
+	// Cari BEM berdasarkan org + period
+	err := s.db.Where("period = ?", periode).First(&bem).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// kalau belum ada, buat baru
+		bem = models.BEM{
+			Period: periode,
+		}
+		if err := s.db.Create(&bem).Error; err != nil {
+			return nil, err
+		}
+	} else if err != nil {
 		return nil, err
 	}
 
-	// update data yang di-assign
-	student.OrganizationID = orgID
-	student.Position = role
+	// mapping role ke kolom yang sesuai
+	switch strings.ToLower(role) {
+	case "ketua_bem":
+		bem.LeaderID = studentID
+	case "wakil_ketua_bem":
+		bem.CoLeaderID = studentID
+	case "sekretaris_bem_1":
+		bem.Secretary1ID = studentID
+	case "sekretaris_bem_2":
+		bem.Secretary2ID = studentID
+	case "bendahara_bem_1":
+		bem.Treasurer1ID = studentID
+	case "bendahara_bem_2":
+		bem.Treasurer2ID = studentID
+	default:
+		return nil, fmt.Errorf("unknown role: %s", role)
+	}
 
-	if err := s.repository.Update(student); err != nil {
+	// simpan perubahan
+	if err := s.db.Save(&bem).Error; err != nil {
 		return nil, err
 	}
 
-	return student, nil
+	return &bem, nil
 }
 
+func (s *StudentService) AssignToPeriod(studentID uint, orgID int, role string, periode string) (*models.Period, error) {
+	var period models.Period
+
+	// Cek apakah period dengan org + period sudah ada
+	err := s.db.Where("organization_id = ? AND period = ?", orgID, periode).First(&period).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// kalau belum ada → buat baru
+		period = models.Period{
+			OrganizationID: orgID,
+			Period:         periode,
+			Vision:         "-",
+			Mission:        "-",
+			Workplan:       "-",
+		}
+		if err := s.db.Create(&period).Error; err != nil {
+			return nil, err
+		}
+	} else if err != nil {
+		return nil, err
+	}
+
+	// Mapping role ke kolom
+	switch strings.ToLower(role) {
+	case "ketua_himpunan", "ketua_ukm", "ketua_department":
+		period.LeaderID = studentID
+	case "wakil_ketua_himpunan", "wakil_ketua_ukm", "wakil_ketua_department":
+		period.CoLeaderID = studentID
+	case "sekretaris_himpunan_1", "sekretaris_ukm_1", "sekretaris_department_1":
+		period.Secretary1ID = studentID
+	case "sekretaris_himpunan_2", "sekretaris_ukm_2", "sekretaris_department_2":
+		period.Secretary2ID = studentID
+	case "bendahara_himpunan_1", "bendahara_ukm_1", "bendahara_department_1":
+		period.Treasurer1ID = studentID
+	case "bendahara_himpunan_2", "bendahara_ukm_2", "bendahara_department_2":
+		period.Treasurer2ID = studentID
+	default:
+		return nil, fmt.Errorf("role %s tidak dikenali untuk Period", role)
+	}
+
+	// Simpan perubahan
+	if err := s.db.Save(&period).Error; err != nil {
+		return nil, err
+	}
+
+	return &period, nil
+}
