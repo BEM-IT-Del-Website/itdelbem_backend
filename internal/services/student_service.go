@@ -194,7 +194,7 @@ func (s *StudentService) fetchStudentsFromCampus(token string) ([]models.CampusS
 func (s *StudentService) AssignToBem(studentID uint, role, positionTitle, periode string) (*models.BEM, error) {
 	var bem models.BEM
 
-	// Cari BEM berdasarkan org + period
+	// Cari BEM berdasarkan periode
 	err := s.db.Where("period = ?", periode).First(&bem).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// kalau belum ada, buat baru
@@ -208,7 +208,27 @@ func (s *StudentService) AssignToBem(studentID uint, role, positionTitle, period
 		return nil, err
 	}
 
-	// mapping role ke kolom yang sesuai
+	// --- cari student lama dengan role yang sama ---
+	var oldStudent models.Student
+	if err := s.db.Where("position = ? AND period = ?", role, periode).First(&oldStudent).Error; err == nil {
+		// kosongkan position student lama
+		oldStudent.Position = ""
+		if err := s.db.Save(&oldStudent).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	// --- update student baru ---
+	var newStudent models.Student
+	if err := s.db.First(&newStudent, studentID).Error; err != nil {
+		return nil, err
+	}
+	newStudent.Position = role
+	if err := s.db.Save(&newStudent).Error; err != nil {
+		return nil, err
+	}
+
+	// --- mapping role ke model BEM ---
 	switch strings.ToLower(role) {
 	case "ketua_bem":
 		bem.LeaderID = studentID
@@ -226,7 +246,7 @@ func (s *StudentService) AssignToBem(studentID uint, role, positionTitle, period
 		return nil, fmt.Errorf("unknown role: %s", role)
 	}
 
-	// simpan perubahan
+	// simpan perubahan BEM
 	if err := s.db.Save(&bem).Error; err != nil {
 		return nil, err
 	}
@@ -255,7 +275,29 @@ func (s *StudentService) AssignToPeriod(studentID uint, orgID int, role string, 
 		return nil, err
 	}
 
-	// Mapping role ke kolom
+	// --- cari student lama dengan role yang sama ---
+	var oldStudent models.Student
+	if err := s.db.Where("position = ? AND period = ? AND organization_id = ?", role, periode, orgID).
+		First(&oldStudent).Error; err == nil {
+		// kosongkan position student lama
+		oldStudent.Position = ""
+		if err := s.db.Save(&oldStudent).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	// --- update student baru ---
+	var newStudent models.Student
+	if err := s.db.First(&newStudent, studentID).Error; err != nil {
+		return nil, err
+	}
+	newStudent.Position = role
+	newStudent.OrganizationID = orgID
+	if err := s.db.Save(&newStudent).Error; err != nil {
+		return nil, err
+	}
+
+	// --- mapping role ke kolom di Period ---
 	switch strings.ToLower(role) {
 	case "ketua_himpunan", "ketua_ukm", "ketua_department":
 		period.LeaderID = studentID
@@ -273,7 +315,7 @@ func (s *StudentService) AssignToPeriod(studentID uint, orgID int, role string, 
 		return nil, fmt.Errorf("role %s tidak dikenali untuk Period", role)
 	}
 
-	// Simpan perubahan
+	// Simpan perubahan di Period
 	if err := s.db.Save(&period).Error; err != nil {
 		return nil, err
 	}
