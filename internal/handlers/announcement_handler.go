@@ -100,6 +100,12 @@ func (h *AnnouncementHandler) CreateAnnouncement(c *gin.Context) {
 
 	announcement.Title = c.PostForm("title")
 	announcement.Content = c.PostForm("content")
+	userID, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+        return
+    }
+    announcement.AuthorID = userID.(uint)
 
 	// Handle file upload
 	file, err := c.FormFile("file")
@@ -121,7 +127,7 @@ func (h *AnnouncementHandler) CreateAnnouncement(c *gin.Context) {
 			return
 		}
 
-		announcement.FilePath = filePath
+		announcement.FileURL = filePath
 	}
 
 	if err := h.service.Createannouncement(&announcement); err != nil {
@@ -166,7 +172,7 @@ func (h *AnnouncementHandler) UpdateAnnouncement(c *gin.Context) {
 			return
 		}
 
-		announcement.FilePath = filePath
+		announcement.FileURL = filePath
 	}
 
 	if err := h.service.Updateannouncement(&announcement); err != nil {
