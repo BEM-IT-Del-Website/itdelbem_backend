@@ -141,3 +141,7 @@ func (s *BemService) GetBemWithStats(id uint) (*BemWithStats, error) {
 
 // 	return result, nil
 // } 
+
+func (s *BemService) GetBEMByPeriod(period string) (*models.BEM, error) {
+	return s.repository.GetBEMByPeriod(period)
+}

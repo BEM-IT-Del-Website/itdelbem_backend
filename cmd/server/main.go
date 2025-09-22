@@ -74,6 +74,7 @@ func main() {
 	clubHandler := handlers.NewClubHandler(database.DB)
 	galeryHandler := handlers.NewGaleryHandler(database.DB)
 	departmentHandler := handlers.NewDepartmentHandler(database.DB)
+	organizationHandler := handlers.NewOrganizationHandler(database.DB)
 
 	// Guest Page
 	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
@@ -94,6 +95,8 @@ func main() {
 			// Campus API token management (admin only)
 			adminRoutes.GET("/campus/token", campusAuthHandler.GetToken)
 			adminRoutes.POST("/campus/token/refresh", campusAuthHandler.RefreshToken)
+
+			adminRoutes.GET("/organizations/:id", organizationHandler.GetOrganizationByID)
 
 			// Admin access to student data
 			adminRoutes.GET("/students", studentHandler.GetAllStudents)
@@ -128,6 +131,7 @@ func main() {
 			adminRoutes.POST("/bems", bemHandler.CreateBem)
 			adminRoutes.PUT("/bems/:id", bemHandler.UpdateBem)
 			adminRoutes.DELETE("/bems/:id", bemHandler.DeleteBem)
+			adminRoutes.GET("/bems/manage/:period", bemHandler.GetBEMByPeriod)
 
 			adminRoutes.GET("/announcement", announcementHandler.GetAllAnnouncements)
 			adminRoutes.GET("/announcements/:id", announcementHandler.GetAnnouncementByID)

@@ -170,3 +170,15 @@ func (h *BemHandler) DeleteBem(c *gin.Context) {
 		"message": "Bem deleted successfully",
 	})
 } 
+
+func (h *BemHandler) GetBEMByPeriod(c *gin.Context) {
+	period := c.Param("period")
+
+	bem, err := h.service.GetBEMByPeriod(period)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "BEM not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, bem)
+}

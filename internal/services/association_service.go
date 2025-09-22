@@ -125,7 +125,7 @@ func (s *AssociationService) GetAssociationWithStats(id uint) (*AssociationWithS
 		return nil, err
 	}
 	if association == nil {
-		return nil, errors.New("gedung tidak ditemukan")
+		return nil, errors.New("organisasi tidak ditemukan")
 	}
 
 	// Return association with stats

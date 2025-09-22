@@ -125,3 +125,23 @@ func (r *BemRepository) RestoreByName(code string) (*models.BEM, error) {
 
 // 	return count > 0, nil
 // }
+
+func (r *BemRepository) GetBEMByPeriod(period string) (*models.BEM, error) {
+	var bem models.BEM
+
+	err := r.db.
+		Preload("Leader").
+		Preload("CoLeader").
+		Preload("Secretary1").
+		Preload("Secretary2").
+		Preload("Treasurer1").
+		Preload("Treasurer2").
+		Where("period = ? AND deleted_at IS NULL", period).
+		First(&bem).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &bem, nil
+}
