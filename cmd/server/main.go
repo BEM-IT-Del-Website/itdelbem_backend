@@ -61,7 +61,6 @@ func main() {
 	// Register authentication routes
 	router.POST("/api/auth/login", handlers.Login)
 	router.POST("/api/auth/refresh", handlers.RefreshToken)
-	router.GET("/api/profile", handlers.GetCurrentUser)
 
 	// Login for Student or All Role from External API
 	router.POST("/api/auth/campus/login", handlers.CampusLogin)
@@ -161,6 +160,13 @@ func main() {
 		{
 			studentRoutes.GET("/clubs", clubHandler.GetAllClubs)
 			studentRoutes.GET("/clubs/:id", clubHandler.GetClubByID)
+
+			studentRoutes.GET("/departments", departmentHandler.GetAllDepartments)
+			studentRoutes.GET("/departments/:id", departmentHandler.GetDepartmentByID)
+
+			studentRoutes.GET("/associations", associationHandler.GetAllAssociations)
+			studentRoutes.GET("/associations/:id", associationHandler.GetAssociationByID)
+			studentRoutes.GET("/profile", handlers.GetCurrentUser)
 		}
 
 		// Assistant routes

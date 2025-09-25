@@ -3,12 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
-	"strings"
 
 	"bem_be/internal/auth"
+	"bem_be/internal/database"
 	"bem_be/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -50,17 +48,17 @@ func Login(c *gin.Context) {
 		Token:        response.Token,
 		RefreshToken: response.RefreshToken,
 	}
-	
+
 	// Set content type
 	c.Header("Content-Type", "application/json")
-	
+
 	// Manually marshal to JSON to ensure field order
 	jsonBytes, err := json.Marshal(orderedResponse)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating response"})
 		return
 	}
-	
+
 	// Write the response
 	c.Writer.WriteHeader(http.StatusOK)
 	c.Writer.Write(jsonBytes)
@@ -130,28 +128,8 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	// Get the username from the context
-	username, exists := c.Get("username")
-	if !exists {
-		// Use userID as fallback
-		username = fmt.Sprintf("user_%v", userID)
-	}
-
-	// Get the role from the context
-	role, exists := c.Get("role")
-	if !exists || role == "" {
-		// Default to empty string if not found
-		role = "Guest"
-
-		// If this is a lecturer endpoint, assume Dosen role
-		path := c.Request.URL.Path
-		if strings.Contains(path, "/api/lecturer/") {
-			role = "Dosen"
-		}
-	}
-
-	// Convert userID to proper type if needed
-	var userIDValue interface{} = userID
+	// Convert userID ke uint biar bisa query DB
+	var userIDValue uint
 	switch v := userID.(type) {
 	case float64:
 		userIDValue = uint(v)
@@ -159,15 +137,35 @@ func GetCurrentUser(c *gin.Context) {
 		userIDValue = uint(v)
 	case uint:
 		userIDValue = v
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid userID type"})
+		return
 	}
 
-	// Log the user info for debugging
-	log.Printf("GetCurrentUser: id=%v, username=%v, role=%v", userIDValue, username, role)
+	// Query ke model Student
+	var student models.Student
+	if err := database.DB.Where("user_id = ?", userIDValue).First(&student).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Student not found"})
+		return
+	}
 
-	// Return the user data
+	// Return data student + role
+	role, _ := c.Get("role")
+
 	c.JSON(http.StatusOK, gin.H{
-		"id":       userIDValue,
-		"username": username,
-		"role":     role,
+		"id":            student.ID,
+		"name":          student.FullName,
+		"email":         student.Email,
+		"username":      student.UserName,
+		"nim":           student.NIM,
+		"study_program": student.StudyProgram,
+		"image":         student.Image,
+		"role":          role,
+		"linkedin":      student.LinkedIn,
+		"instagram":     student.Instagram,
+		"whatsapp":      student.WhatsApp,
+		"faculty":       student.Faculty,
+		"year_enrolled": student.YearEnrolled,
+		"status":        student.Status,
 	})
 }
