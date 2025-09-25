@@ -149,6 +149,13 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
+	var organization models.Organization
+    if student.OrganizationID != 0 { // pastikan organizationId ada
+        if err := database.DB.Where("id = ?", student.OrganizationID).First(&organization).Error; err != nil {
+            organization = models.Organization{} 
+        }
+    }
+
 	// Return data student + role
 	role, _ := c.Get("role")
 
@@ -167,5 +174,11 @@ func GetCurrentUser(c *gin.Context) {
 		"faculty":       student.Faculty,
 		"year_enrolled": student.YearEnrolled,
 		"status":        student.Status,
+		"position":      student.Position,
+		"organization": gin.H{
+            "id":   organization.ID,
+            "name": organization.Name,
+        },
+
 	})
 }
