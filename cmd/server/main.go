@@ -48,6 +48,7 @@ func main() {
 	router.Static("/associations", "./uploads/associations")
 	router.Static("/clubs", "./uploads/clubs")
 	router.Static("/departments", "./uploads/departments")
+	router.Static("/bems", "./uploads/bems")
 
 	// Configure CORS
 	config := cors.DefaultConfig()
@@ -60,6 +61,7 @@ func main() {
 	// Register authentication routes
 	router.POST("/api/auth/login", handlers.Login)
 	router.POST("/api/auth/refresh", handlers.RefreshToken)
+	router.GET("/api/profile", handlers.GetCurrentUser)
 
 	// Login for Student or All Role from External API
 	router.POST("/api/auth/campus/login", handlers.CampusLogin)
@@ -81,6 +83,7 @@ func main() {
 	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
 	router.GET("/api/club", clubHandler.GetAllClubsGuest)
 	router.GET("/api/department", departmentHandler.GetAllDepartmentsGuest)
+	router.GET("/api/bems/manage/:period", bemHandler.GetBEMByPeriod)
 
 	// Protected routes
 	authRequired := router.Group("/api")
@@ -132,7 +135,6 @@ func main() {
 			adminRoutes.POST("/bems", bemHandler.CreateBem)
 			adminRoutes.PUT("/bems/:id", bemHandler.UpdateBem)
 			adminRoutes.DELETE("/bems/:id", bemHandler.DeleteBem)
-			adminRoutes.GET("/bems/manage/:period", bemHandler.GetBEMByPeriod)
 
 			adminRoutes.GET("/announcement", announcementHandler.GetAllAnnouncements)
 			adminRoutes.GET("/announcements/:id", announcementHandler.GetAnnouncementByID)
@@ -154,9 +156,11 @@ func main() {
 		}
 
 		// Employee routes (replacing assistant routes)
-		employeeRoutes := authRequired.Group("/employee")
-		employeeRoutes.Use(middleware.RoleMiddleware("Pegawai"))
+		studentRoutes := authRequired.Group("/student")
+		studentRoutes.Use(middleware.RoleMiddleware("Mahasiswa"))
 		{
+			studentRoutes.GET("/clubs", clubHandler.GetAllClubs)
+			studentRoutes.GET("/clubs/:id", clubHandler.GetClubByID)
 		}
 
 		// Assistant routes
@@ -167,7 +171,7 @@ func main() {
 	}
 
 	// Start the server
-	port := utils.GetEnvWithDefault("SERVER_PORT", "9090")
+	port := utils.GetEnvWithDefault("SERVER_PORT", "8080")
 
 	// Add public endpoints
 	router.GET("/api/students/by-user-id/:user_id", studentHandler.GetStudentByUserID)

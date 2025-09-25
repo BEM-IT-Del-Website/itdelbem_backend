@@ -14,6 +14,7 @@ type User struct {
 	Password       string         `json:"-" gorm:"not null;size:255"` // Password is not returned in JSON
 	Position       string         `json:"position" gorm:"not null;size:50"`
 	ExternalUserID *int           `json:"external_user_id" gorm:"uniqueIndex;comment:External user ID from campus system"` // External ID from campus system
+	Status         int            `json:"status" gorm:"type:int"`
 	CreatedAt      time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt      time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"` // Soft delete support

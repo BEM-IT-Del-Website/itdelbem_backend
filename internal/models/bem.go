@@ -14,9 +14,9 @@ type BEM struct {
 	CoLeaderID   uint           `json:"coleader_id"`
 	CoLeader     *Student       `json:"coleader" gorm:"foreignKey:ID;references:CoLeaderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Secretary1ID uint           `json:"secretary1_id"`
-	Secretary1   *Student       `json:"secretary1" gorm:"foreignKey:ID;references:Secretary1;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Secretary2ID uint           `json:"secretary_id"`
-	Secretary2   *Student       `json:"secretary" gorm:"foreignKey:ID;references:Secretary2ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Secretary1   *Student       `json:"secretary1" gorm:"foreignKey:ID;references:Secretary1ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Secretary2ID uint           `json:"secretary2_id"`
+	Secretary2   *Student       `json:"secretary2" gorm:"foreignKey:ID;references:Secretary2ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Treasurer1ID uint           `json:"treasurer1_id"`
 	Treasurer1   *Student       `json:"treasurer1" gorm:"foreignKey:ID;references:Treasurer1ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Treasurer2ID uint           `json:"treasurer2_id"`

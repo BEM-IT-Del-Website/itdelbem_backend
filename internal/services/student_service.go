@@ -210,7 +210,7 @@ func (s *StudentService) AssignToBem(studentID uint, role, positionTitle, period
 
 	// --- cari student lama dengan role yang sama ---
 	var oldStudent models.Student
-	if err := s.db.Where("position = ? AND period = ?", role, periode).First(&oldStudent).Error; err == nil {
+	if err := s.db.Where("position = ?", role).First(&oldStudent).Error; err == nil {
 		// kosongkan position student lama
 		oldStudent.Position = ""
 		if err := s.db.Save(&oldStudent).Error; err != nil {
@@ -277,7 +277,7 @@ func (s *StudentService) AssignToPeriod(studentID uint, orgID int, role string, 
 
 	// --- cari student lama dengan role yang sama ---
 	var oldStudent models.Student
-	if err := s.db.Where("position = ? AND period = ? AND organization_id = ?", role, periode, orgID).
+	if err := s.db.Where("position = ? AND organization_id = ?", role, orgID).
 		First(&oldStudent).Error; err == nil {
 		// kosongkan position student lama
 		oldStudent.Position = ""
