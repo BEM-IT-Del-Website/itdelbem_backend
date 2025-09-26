@@ -49,6 +49,7 @@ func main() {
 	router.Static("/clubs", "./uploads/clubs")
 	router.Static("/departments", "./uploads/departments")
 	router.Static("/bems", "./uploads/bems")
+	router.Static("/users", "./uploads/user")
 
 	// Configure CORS
 	config := cors.DefaultConfig()
@@ -167,6 +168,7 @@ func main() {
 			studentRoutes.GET("/associations", associationHandler.GetAllAssociations)
 			studentRoutes.GET("/associations/:id", associationHandler.GetAssociationByID)
 			studentRoutes.GET("/profile", handlers.GetCurrentUser)
+			studentRoutes.PUT("/profile", handlers.EditProfile)
 		}
 
 		// Assistant routes

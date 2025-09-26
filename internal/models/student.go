@@ -26,7 +26,7 @@ type Student struct {
 	Dormitory      string         `json:"dormitory" gorm:"type:varchar(50)"`
 	Position       string         `json:"position" gorm:"type:varchar(50)"`
 	LinkedIn       string         `json:"linkedin" gorm:"type:varchar(150)"`
-	WhatsApp       int            `json:"whatsapp" gorm:"type:int"`
+	WhatsApp       string         `json:"whatsapp" gorm:"type:varchar(100)"`
 	Instagram      string         `json:"instagram" gorm:"type:varchar(100)"`
 	Image          string         `json:"image" gorm:"type:varchar(100)"`
 	LastSync       time.Time      `json:"last_sync" gorm:"autoCreateTime"`
