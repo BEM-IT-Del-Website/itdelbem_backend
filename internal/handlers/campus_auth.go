@@ -72,9 +72,9 @@ func CampusLogin(c *gin.Context) {
 
 	// Use custom response struct to ensure the correct field order
 	orderedResponse := models.OrderedLoginResponse{
-		User:         loginResponse.User,
-		Token:        loginResponse.Token,
-		RefreshToken: loginResponse.RefreshToken,
+		User:           loginResponse.User,
+		Token:          loginResponse.Token,
+		RefreshToken:   loginResponse.RefreshToken,
 		Position:       student.Position,
 		OrganizationID: student.OrganizationID,
 	}

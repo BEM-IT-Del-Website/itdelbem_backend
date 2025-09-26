@@ -73,15 +73,19 @@ func Initialize() {
 	}
 	log.Println("User table migrated successfully")
 
-	// Himpunan
 	err = DB.AutoMigrate(&models.Category{})
 	if err != nil {
 		log.Fatalf("Error auto-migrating Category model: %v\n", err)
 	}
 	log.Println("Category table migrated successfully")
 
-	// Himpunan
 	err = DB.AutoMigrate(&models.Organization{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Organization model: %v\n", err)
+	}
+	log.Println("Organization table migrated successfully")
+
+	err = DB.AutoMigrate(&models.Period{})
 	if err != nil {
 		log.Fatalf("Error auto-migrating Organization model: %v\n", err)
 	}

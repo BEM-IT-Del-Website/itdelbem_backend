@@ -66,6 +66,7 @@ type LoginResponse struct {
 	RefreshToken   string `json:"refresh_token"` // Field name must match frontend expectations
 	Position       string `json:"position"`
 	OrganizationID int    `json:"organization_id"`
+	PeriodID       int    `json:"period_id"`
 }
 
 // OrderedLoginResponse represents a login response with controlled field order
@@ -75,6 +76,7 @@ type OrderedLoginResponse struct {
 	RefreshToken   string `json:"refresh_token"`
 	Position       string `json:"position"`
 	OrganizationID int    `json:"organization_id"`
+	PeriodID       int    `json:"period_id"`
 }
 
 // RefreshRequest represents the refresh token request body

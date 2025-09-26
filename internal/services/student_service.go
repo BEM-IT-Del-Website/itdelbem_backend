@@ -288,7 +288,7 @@ func (s *StudentService) AssignToPeriod(studentID uint, orgID int, role string, 
 
 	// --- update student baru ---
 	var newStudent models.Student
-	if err := s.db.First(&newStudent, studentID).Error; err != nil {
+	if err := s.db.Where("user_id = ?", studentID).First(&newStudent).Error; err != nil {
 		return nil, err
 	}
 	newStudent.Position = role
