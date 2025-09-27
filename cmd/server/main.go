@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	
+
 	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
@@ -78,7 +78,7 @@ func main() {
 	galeryHandler := handlers.NewGaleryHandler(database.DB)
 	departmentHandler := handlers.NewDepartmentHandler(database.DB)
 	organizationHandler := handlers.NewOrganizationHandler(database.DB)
-
+	requestHandler := handlers.NewRequestHandler(database.DB)
 	// Guest Page
 	router.GET("/api/association", associationHandler.GetAllAssociationsGuest)
 	router.GET("/api/club", clubHandler.GetAllClubsGuest)
@@ -153,6 +153,12 @@ func main() {
 			adminRoutes.POST("/department", departmentHandler.CreateDepartment)
 			adminRoutes.PUT("/department/:id", departmentHandler.UpdateDepartment)
 			adminRoutes.DELETE("/department/:id", departmentHandler.DeleteDepartment)
+
+			adminRoutes.GET("/request", requestHandler.GetAllRequests)
+			adminRoutes.GET("/request/:id", requestHandler.GetRequestByID)
+			adminRoutes.POST("/request", requestHandler.CreateRequest)
+			adminRoutes.PUT("/request/:id", requestHandler.UpdateRequest)
+			adminRoutes.DELETE("/request/:id", requestHandler.DeleteRequest)
 		}
 
 		// Employee routes (replacing assistant routes)

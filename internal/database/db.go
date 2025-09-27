@@ -152,6 +152,12 @@ func Initialize() {
 	}
 	log.Println("Galery table migrated successfully")
 
+	err = DB.AutoMigrate(&models.Request{})
+	if err != nil {
+		log.Fatalf("Error auto-migrating Request model: %v\n", err)
+	}
+	log.Println("Request table migrated successfully")
+
 	log.Println("Database schema migrated successfully")
 
 }

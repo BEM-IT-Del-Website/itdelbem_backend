@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"log"
 	"errors"
+	"log"
 
 	"bem_be/internal/database"
 	"bem_be/internal/models"
@@ -31,45 +31,46 @@ func (r *StudentRepository) Update(student *models.Student) error {
 
 // FindAll returns all students from the database with optional search and filters
 func (r *StudentRepository) FindAll(limit, offset int, search, studyProgram string, yearEnrolled int) ([]models.Student, int64, error) {
-    var students []models.Student
-    var total int64
+	var students []models.Student
+	var total int64
 
-    query := r.db.Model(&models.Student{})
+	query := r.db.Model(&models.Student{})
 
-    // filter by search (di full_name, study_program, year_enrolled)
-    if search != "" {
-        likeSearch := "%" + search + "%"
-        query = query.Where(
-            r.db.Where("full_name LIKE ?", likeSearch).
-                Or("study_program LIKE ?", likeSearch).
-                Or("CAST(year_enrolled AS CHAR) LIKE ?", likeSearch),
-        )
-    }
+	// filter by search (di full_name, study_program, year_enrolled)
+	if search != "" {
+		likeSearch := "%" + search + "%"
+		query = query.Where(
+			r.db.Where("full_name LIKE ?", likeSearch).
+				Or("study_program LIKE ?", likeSearch).
+				Or("CAST(year_enrolled AS CHAR) LIKE ?", likeSearch),
+		)
+	}
 
-    // filter by study program (pakai LIKE biar fleksibel)
-    if studyProgram != "" {
-        query = query.Where("study_program LIKE ?", "%"+studyProgram+"%")
-    }
+	// filter by study program (pakai LIKE biar fleksibel)
+	if studyProgram != "" {
+		query = query.Where("study_program LIKE ?", "%"+studyProgram+"%")
+	}
 
-    // filter by year enrolled
-    if yearEnrolled > 0 {
-        query = query.Where("year_enrolled = ?", yearEnrolled)
-    }
+	// filter by year enrolled
+	if yearEnrolled > 0 {
+		query = query.Where("year_enrolled = ?", yearEnrolled)
+	}
 
-    // hitung total sesuai filter
-    query.Count(&total)
+	// hitung total sesuai filter
+	query.Count(&total)
 
-    // ambil data
-    result := query.
-        Order("year_enrolled ASC").
-        Order("study_program ASC").
-        Order("nim ASC").
-        Limit(limit).
-        Offset(offset).
-        Find(&students)
+	// ambil data
+	result := query.
+		Order("year_enrolled ASC").
+		Order("study_program ASC").
+		Order("nim ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&students)
 
-    return students, total, result.Error
+	return students, total, result.Error
 }
+
 // FindByID returns a student by ID
 func (r *StudentRepository) FindByID(id uint) (*models.Student, error) {
 	var student models.Student
@@ -93,7 +94,7 @@ func (r *StudentRepository) FindByNIM(nim string) (*models.Student, error) {
 // FindByUserID returns a student by external UserID from campus
 func (r *StudentRepository) FindByUserID(userID int) (*models.Student, error) {
 	var student models.Student
-	result := r.db.Where("user_id = ?", userID).First(&student)
+	result := r.db.Preload("Organization").Where("user_id = ?", userID).First(&student)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -177,4 +178,3 @@ func (r *StudentRepository) UpdateBem(bem *models.BEM) error {
 func (r *StudentRepository) SavePeriod(period *models.Period) error {
 	return r.db.Create(period).Error
 }
-
